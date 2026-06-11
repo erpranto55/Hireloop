@@ -49,9 +49,9 @@ const Hero = () => {
             
             {/* --- Background Effects --- */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#4f46e530,transparent_45%)]" />
-            <div className="absolute left-[-150px] top-32 h-[400px] w-[400px] rounded-full bg-violet-600/20 blur-[150px]" />
-            <div className="absolute right-[-150px] top-52 h-[400px] w-[400px] rounded-full bg-blue-600/20 blur-[150px]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle,#6366f110_1px,transparent_1px)] [background-size:32px_32px]" />
+            <div className="absolute -left-37.5 top-32 h-100 w-100 rounded-full bg-violet-600/20 blur-[150px]" />
+            <div className="absolute -right-37.5 top-52 h-100 w-100 rounded-full bg-blue-600/20 blur-[150px]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle,#6366f110_1px,transparent_1px)] bg-size-[32px_32px]" />
 
             <div className="relative z-10 container mx-auto px-4">
                 
@@ -71,7 +71,7 @@ const Hero = () => {
                         <span className="block text-5xl text-white md:text-7xl lg:text-8xl">
                             Find Your
                         </span>
-                        <span className="block bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-5xl text-transparent md:text-7xl lg:text-8xl pb-2">
+                        <span className="block bg-linear-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-5xl text-transparent md:text-7xl lg:text-8xl pb-2">
                             Dream Job
                         </span>
                         <span className="block text-5xl text-white md:text-7xl lg:text-8xl">
@@ -85,7 +85,7 @@ const Hero = () => {
                     </p>
 
                     {/* Search Bar */}
-                    <div className="mt-12 w-full max-w-5xl rounded-3xl border border-white/10 bg-white/[0.04] p-2 backdrop-blur-2xl">
+                    <div className="mt-12 w-full max-w-5xl rounded-3xl border border-white/10 bg-white/4 p-2 backdrop-blur-2xl">
                         <div className="flex flex-col md:flex-row">
                             <div className="flex flex-1 items-center px-5">
                                 <Search className="text-gray-500" size={20} />
@@ -107,7 +107,7 @@ const Hero = () => {
                                 />
                             </div>
 
-                            <button className="rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-8 py-4 font-medium text-white transition hover:scale-105">
+                            <button className="rounded-2xl bg-linear-to-r from-violet-600 to-blue-600 px-8 py-4 font-medium text-white transition hover:scale-105">
                                 Search Jobs
                             </button>
                         </div>
@@ -118,7 +118,7 @@ const Hero = () => {
                         {tags.map((tag) => (
                             <button
                                 key={tag}
-                                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-gray-400 transition hover:border-violet-500/30 hover:text-white"
+                                className="rounded-full border border-white/10 bg-white/3 px-4 py-2 text-xs text-gray-400 transition hover:border-violet-500/30 hover:text-white"
                             >
                                 {tag}
                             </button>
