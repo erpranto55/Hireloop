@@ -130,7 +130,7 @@ const Hero = () => {
                 <div className="relative -mt-8 flex flex-col items-center">
                     
                     {/* Purple Glow behind globe */}
-                    <div className="absolute top-20 h-[350px] w-[350px] rounded-full bg-violet-600/30 blur-[150px]" />
+                    <div className="absolute top-20 h-87.5 w-87.5 rounded-full bg-violet-600/30 blur-[150px]" />
 
                     {/* Globe Image */}
                     <Image
@@ -139,11 +139,11 @@ const Hero = () => {
                         width={1600}
                         height={1600}
                         priority
-                        className="relative z-10 w-full max-w-[1000px] scale-[1.45] object-contain pointer-events-none"
+                        className="relative z-10 w-full max-w-250 scale-[1.45] object-contain pointer-events-none"
                     />
 
                     {/* Globe Text Overlay */}
-                    <div className="absolute top-[140px] z-20 text-center">
+                    <div className="absolute top-35 z-20 text-center">
                         <h3 className="text-2xl md:text-4xl font-semibold text-white">
                             Assisting over 15,000 job seekers
                         </h3>
@@ -181,7 +181,7 @@ const Hero = () => {
             </div>
 
             {/* --- Trusted By Logos Section --- */}
-            <div className="relative z-30 mt-32 border-t border-white/10 bg-white/[0.02] py-12">
+            <div className="relative z-30 mt-32 border-t border-white/10 bg-white/2 py-12">
                 <div className="container mx-auto px-4">
                     <p className="mb-8 text-center text-sm font-semibold tracking-wider text-gray-500 uppercase">
                         Trusted by top companies worldwide
