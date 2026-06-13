@@ -126,58 +126,81 @@ const Hero = () => {
                     </div>
                 </div>
 
-                {/* --- Globe & Stats Section --- */}
-                <div className="relative -mt-8 flex flex-col items-center">
-                    
-                    {/* Purple Glow behind globe */}
-                    <div className="absolute top-20 h-87.5 w-87.5 rounded-full bg-violet-600/30 blur-[150px]" />
+                {/* Globe & Stats Section */}
+<div className="relative mt-20 flex flex-col items-center">
 
-                    {/* Globe Image */}
-                    <Image
-                        src="/images/globe.png"
-                        alt="3D Globe"
-                        width={1600}
-                        height={1600}
-                        priority
-                        className="relative z-10 w-full max-w-250 scale-[1.45] object-contain pointer-events-none"
-                    />
+    {/* Glow */}
+    <div className="absolute top-24 h-[500px] w-[500px] rounded-full bg-violet-600/30 blur-[180px]" />
 
-                    {/* Globe Text Overlay */}
-                    <div className="absolute top-35 z-20 text-center">
-                        <h3 className="text-2xl md:text-4xl font-semibold text-white">
-                            Assisting over 15,000 job seekers
+    {/* Globe Wrapper */}
+    <div className="relative flex justify-center w-full">
+
+        <Image
+            src="/images/globe.png"
+            alt="3D Globe"
+            width={1400}
+            height={700}
+            priority
+            className="
+                w-full
+                max-w-[1100px]
+                object-contain
+                pointer-events-none
+                select-none
+            "
+        />
+
+        {/* Text Overlay */}
+        <div className="absolute top-[22%] left-1/2 -translate-x-1/2 text-center z-20">
+            <h3 className="text-2xl md:text-4xl font-semibold text-white">
+                Assisting over 15,000 job seekers
+            </h3>
+
+            <p className="mt-2 text-gray-300">
+                find their dream positions.
+            </p>
+        </div>
+    </div>
+
+    {/* Stats Cards */}
+    <div className="relative z-30 -mt-16 md:-mt-24 w-full max-w-5xl px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                    <div
+                        key={item.label}
+                        className="
+                            rounded-2xl
+                            border border-white/10
+                            bg-black/80
+                            backdrop-blur-xl
+                            p-6
+                            transition-all
+                            duration-300
+                            hover:-translate-y-2
+                            hover:border-violet-500/30
+                        "
+                    >
+                        <Icon
+                            size={18}
+                            className="mb-4 text-violet-400"
+                        />
+
+                        <h3 className="text-4xl font-bold text-white">
+                            {item.value}
                         </h3>
-                        <p className="mt-2 text-gray-300">
-                            find their dream positions.
+
+                        <p className="mt-2 text-sm text-gray-400">
+                            {item.label}
                         </p>
                     </div>
-
-                    {/* Stat Cards */}
-                    <div className="relative z-30 -mt-24 w-full max-w-5xl px-4">
-                        <div className="grid gap-4 md:grid-cols-4">
-                            {stats.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <div
-                                        key={item.label}
-                                        className="rounded-2xl border border-white/10 bg-black/80 backdrop-blur-xl p-6 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30"
-                                    >
-                                        <Icon
-                                            size={18}
-                                            className="mb-4 text-violet-400"
-                                        />
-                                        <h3 className="text-4xl font-bold text-white">
-                                            {item.value}
-                                        </h3>
-                                        <p className="mt-2 text-sm text-gray-400">
-                                            {item.label}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
+                );
+            })}
+        </div>
+    </div>
+</div>
             </div>
 
             {/* --- Trusted By Logos Section --- */}
