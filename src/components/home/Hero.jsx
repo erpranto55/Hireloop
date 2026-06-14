@@ -46,7 +46,7 @@ const companyLogos = [
 const Hero = () => {
     return (
         <section className="relative overflow-hidden bg-black">
-            
+
             {/* --- Background Effects --- */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#4f46e530,transparent_45%)]" />
             <div className="absolute -left-37.5 top-32 h-100 w-100 rounded-full bg-violet-600/20 blur-[150px]" />
@@ -54,10 +54,10 @@ const Hero = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle,#6366f110_1px,transparent_1px)] bg-size-[32px_32px]" />
 
             <div className="relative z-10 container mx-auto px-4">
-                
+
                 {/* --- Hero Content --- */}
                 <div className="flex flex-col items-center pt-32 md:pt-40">
-                    
+
                     {/* Badge */}
                     <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-5 py-2 backdrop-blur-xl">
                         <div className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
@@ -127,51 +127,51 @@ const Hero = () => {
                 </div>
 
                 {/* Globe & Stats Section */}
-<div className="relative mt-20 flex flex-col items-center">
+                <div className="relative mt-20 flex flex-col items-center">
 
-    {/* Glow */}
-    <div className="absolute top-24 h-[500px] w-[500px] rounded-full bg-violet-600/30 blur-[180px]" />
+                    {/* Glow */}
+                    <div className="absolute top-24 h-[500px] w-[500px] rounded-full bg-violet-600/30 blur-[180px]" />
 
-    {/* Globe Wrapper */}
-    <div className="relative flex justify-center w-full">
+                    {/* Globe Wrapper */}
+                    <div className="relative flex justify-center w-full">
 
-        <Image
-            src="/images/globe.png"
-            alt="3D Globe"
-            width={1400}
-            height={700}
-            priority
-            className="
+                        <Image
+                            src="/images/globe.png"
+                            alt="3D Globe"
+                            width={1400}
+                            height={700}
+                            priority
+                            className="
                 w-full
                 max-w-[1100px]
                 object-contain
                 pointer-events-none
                 select-none
             "
-        />
+                        />
 
-        {/* Text Overlay */}
-        <div className="absolute top-[22%] left-1/2 -translate-x-1/2 text-center z-20">
-            <h3 className="text-2xl md:text-4xl font-semibold text-white">
-                Assisting over 15,000 job seekers
-            </h3>
+                        {/* Text Overlay */}
+                        <div className="absolute top-[22%] left-1/2 -translate-x-1/2 text-center z-20">
+                            <h3 className="text-2xl md:text-4xl font-semibold text-white">
+                                Assisting over 15,000 job seekers
+                            </h3>
 
-            <p className="mt-2 text-gray-300">
-                find their dream positions.
-            </p>
-        </div>
-    </div>
+                            <p className="mt-2 text-gray-300">
+                                find their dream positions.
+                            </p>
+                        </div>
+                    </div>
 
-    {/* Stats Cards */}
-    <div className="relative z-30 -mt-16 md:-mt-24 w-full max-w-5xl px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((item) => {
-                const Icon = item.icon;
+                    {/* Stats Cards */}
+                    <div className="relative z-30 -mt-16 md:-mt-24 w-full max-w-5xl px-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {stats.map((item) => {
+                                const Icon = item.icon;
 
-                return (
-                    <div
-                        key={item.label}
-                        className="
+                                return (
+                                    <div
+                                        key={item.label}
+                                        className="
                             rounded-2xl
                             border border-white/10
                             bg-black/80
@@ -182,25 +182,25 @@ const Hero = () => {
                             hover:-translate-y-2
                             hover:border-violet-500/30
                         "
-                    >
-                        <Icon
-                            size={18}
-                            className="mb-4 text-violet-400"
-                        />
+                                    >
+                                        <Icon
+                                            size={18}
+                                            className="mb-4 text-violet-400"
+                                        />
 
-                        <h3 className="text-4xl font-bold text-white">
-                            {item.value}
-                        </h3>
+                                        <h3 className="text-4xl font-bold text-white">
+                                            {item.value}
+                                        </h3>
 
-                        <p className="mt-2 text-sm text-gray-400">
-                            {item.label}
-                        </p>
+                                        <p className="mt-2 text-sm text-gray-400">
+                                            {item.label}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
-                );
-            })}
-        </div>
-    </div>
-</div>
+                </div>
             </div>
 
             {/* --- Trusted By Logos Section --- */}
@@ -209,12 +209,12 @@ const Hero = () => {
                     <p className="mb-8 text-center text-sm font-semibold tracking-wider text-gray-500 uppercase">
                         Trusted by top companies worldwide
                     </p>
-                    
+
                     {/* Grid for logos (Using grayscale for a cleaner look, revealing color on hover) */}
                     <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
                         {companyLogos.map((logo, idx) => (
-                            <div 
-                                key={idx} 
+                            <div
+                                key={idx}
                                 className="relative h-8 w-24 md:h-10 md:w-28 opacity-60 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0"
                             >
                                 <Image
