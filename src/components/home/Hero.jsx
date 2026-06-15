@@ -130,7 +130,7 @@ const Hero = () => {
                 <div className="relative mt-20 flex flex-col items-center">
 
                     {/* Glow */}
-                    <div className="absolute top-24 h-[500px] w-[500px] rounded-full bg-violet-600/30 blur-[180px]" />
+                    <div className="absolute top-24 h-125 w-125 rounded-full bg-violet-600/30 blur-[180px]" />
 
                     {/* Globe Wrapper */}
                     <div className="relative flex justify-center w-full">
@@ -143,7 +143,7 @@ const Hero = () => {
                             priority
                             className="
                 w-full
-                max-w-[1100px]
+                max-w-275
                 object-contain
                 pointer-events-none
                 select-none
