@@ -9,7 +9,7 @@ const NavBar = () => {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-6">
-            <div className="w-full max-w-6xl">
+            <div className="w-full container">
                 <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-xl shadow-[0_0_40px_rgba(99,102,241,0.08)]">
 
                     {/* Logo */}
