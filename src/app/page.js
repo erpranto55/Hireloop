@@ -1,14 +1,14 @@
 import CTA from "@/components/home/CTA";
+import Features from "@/components/home/Features";
 import Hero from "@/components/home/Hero";
 import Pricing from "@/components/home/Pricing";
-import Footer from "@/components/shared/Footer";
-import NavBar from "@/components/shared/NavBar";
-import Image from "next/image";
+
 
 export default function Home() {
   return (
     <div>
       <Hero />
+      <Features />
       <Pricing />
       <CTA />
     </div>
