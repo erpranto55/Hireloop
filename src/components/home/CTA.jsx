@@ -5,7 +5,7 @@ export default function CTA() {
     return (
         <section className="relative overflow-hidden bg-black">
             <div className="container mx-auto px-6">
-                <div className="relative flex min-h-[650px] items-center justify-center">
+                <div className="relative flex min-h-162.5 items-center justify-center">
                     {/* Background Grid */}
                     <Image
                         src="/images/cta-bg.png"
@@ -16,7 +16,7 @@ export default function CTA() {
                     />
 
                     {/* Purple Glow */}
-                    <div className="absolute top-0 left-1/2 h-[300px] w-[700px] -translate-x-1/2 rounded-full bg-indigo-600/30 blur-[140px]" />
+                    <div className="absolute top-0 left-1/2 h-75 w-175 -translate-x-1/2 rounded-full bg-indigo-600/30 blur-[140px]" />
 
                     {/* Content */}
                     <div className="relative z-10 mx-auto max-w-4xl text-center">

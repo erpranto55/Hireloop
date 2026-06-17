@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Link, Button } from "@heroui/react";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,18 +14,24 @@ const NavBar = () => {
                 <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-xl shadow-[0_0_40px_rgba(99,102,241,0.08)]">
 
                     {/* Logo */}
-                    <div className="flex items-center">
-                        <h2 className="text-3xl font-bold">
-                            <span className="text-blue-500">hire</span>
-                            <span className="text-orange-500">loop</span>
-                        </h2>
-                    </div>
+                    <Link
+                        href="/"
+                        className="flex items-center"
+                    >
+                        <Image
+                            src="/images/logo.png"
+                            alt="HireLoop Logo"
+                            width={120}
+                            height={120} />
+                    </Link>
+
+
 
                     {/* Desktop Navigation */}
                     <ul className="hidden items-center gap-10 md:flex">
                         <li>
                             <Link
-                                href="#jobs"
+                                href="/jobs"
                                 className="text-sm text-white/70 transition hover:text-white"
                             >
                                 Browse Jobs
@@ -33,7 +40,7 @@ const NavBar = () => {
 
                         <li>
                             <Link
-                                href="#company"
+                                href="/company"
                                 className="text-sm text-white/70 transition hover:text-white"
                             >
                                 Company
@@ -42,7 +49,7 @@ const NavBar = () => {
 
                         <li>
                             <Link
-                                href="#pricing"
+                                href="/pricing"
                                 className="text-sm text-white/70 transition hover:text-white"
                             >
                                 Pricing
@@ -86,7 +93,7 @@ const NavBar = () => {
                         <ul className="flex flex-col p-4">
                             <li>
                                 <Link
-                                    href="#jobs"
+                                    href="/jobs"
                                     className="py-3 text-white/80"
                                 >
                                     Browse Jobs
@@ -95,7 +102,7 @@ const NavBar = () => {
 
                             <li>
                                 <Link
-                                    href="#company"
+                                    href="/company"
                                     className="py-3 text-white/80"
                                 >
                                     Company
@@ -104,7 +111,7 @@ const NavBar = () => {
 
                             <li>
                                 <Link
-                                    href="#pricing"
+                                    href="/pricing"
                                     className="py-3 text-white/80"
                                 >
                                     Pricing

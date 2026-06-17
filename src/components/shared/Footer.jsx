@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FaFacebookF, FaPinterestP, FaLinkedinIn } from "react-icons/fa";
 
@@ -58,11 +59,15 @@ export default function Footer() {
           <div className="grid gap-14 text-center lg:grid-cols-[1.7fr_1fr_1fr_1fr] lg:text-left">
             {/* Brand Section */}
             <div className="flex flex-col items-center lg:items-start">
-              <Link href="/">
-                <h2 className="text-4xl font-bold tracking-tight">
-                  <span className="text-blue-500">hire</span>
-                  <span className="text-orange-500">loop</span>
-                </h2>
+              <Link
+                href="/"
+                className="flex items-center"
+              >
+                <Image
+                  src="/images/logo.png"
+                  alt="HireLoop Logo"
+                  width={120}
+                  height={120} />
               </Link>
 
               <p className="mt-6 max-w-xs text-sm leading-7 text-zinc-500 lg:max-w-sm">
