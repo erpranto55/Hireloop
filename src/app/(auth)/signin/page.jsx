@@ -12,6 +12,7 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 
 import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 
 export default function SigninPage() {
     const router = useRouter();
@@ -55,7 +56,7 @@ export default function SigninPage() {
             if (error) {
                 toast.error(
                     error.message ||
-                        "Invalid email or password"
+                    "Invalid email or password"
                 );
                 return;
             }
@@ -94,14 +95,17 @@ export default function SigninPage() {
                     {/* Left Side */}
                     <div className="hidden flex-col justify-between border-r border-white/10 p-12 lg:flex">
                         <div>
-                            <h1 className="text-5xl font-bold">
-                                <span className="text-blue-500">
-                                    hire
-                                </span>
-                                <span className="text-orange-500">
-                                    loop
-                                </span>
-                            </h1>
+                            {/* Logo */}
+                            <Link
+                                href="/"
+                                className="flex items-center"
+                            >
+                                <Image
+                                    src="/images/logo.png"
+                                    alt="HireLoop Logo"
+                                    width={120}
+                                    height={120} />
+                            </Link>
 
                             <div className="my-5">
                                 <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-medium uppercase tracking-wider text-violet-400">
