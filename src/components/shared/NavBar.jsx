@@ -154,30 +154,92 @@ const NavBar = () => {
                         {isPending ? (
                             <div className="h-10 w-10 animate-pulse rounded-full bg-white/10" />
                         ) : user ? (
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <Link
+                                    href="/profile"
+                                    className="
+            group
+            flex
+            items-center
+            gap-3
+            rounded-full
+            border
+            border-white/10
+            bg-white/5
+            px-2
+            py-1
+            backdrop-blur-md
+            transition-all
+            duration-300
+            hover:border-violet-500/40
+            hover:bg-white/10
+            hover:shadow-lg
+            hover:shadow-violet-500/10
+        "
+                                >
+                                    {user?.image ? (
+                                        <Image
+                                            src={user.image}
+                                            alt={user.name || "User"}
+                                            width={40}
+                                            height={40}
+                                            className="
+                    h-10
+                    w-10
+                    rounded-full
+                    object-cover
+                    ring-2
+                    ring-violet-500/40
+                "
+                                        />
+                                    ) : (
+                                        <div
+                                            className="
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-linear-to-r
+                    from-violet-600
+                    via-purple-600
+                    to-fuchsia-600
+                    text-sm
+                    font-bold
+                    text-white
+                "
+                                        >
+                                            {user?.name?.charAt(0)?.toUpperCase()}
+                                        </div>
+                                    )}
 
-                                <RxAvatar />
+                                    <div className="hidden lg:block">
+                                        <p className="text-sm font-medium text-white leading-none">
+                                            {user?.name}
+                                        </p>
+
+                                        <p className="mt-1 text-xs text-zinc-400">
+                                            View Profile
+                                        </p>
+                                    </div>
+                                </Link>
 
                                 <Button
-                                    onPress={
-                                        handleSignOut
-                                    }
-                                    startContent={
-                                        <LogOut size={16} />
-                                    }
+                                    isIconOnly
+                                    variant="light"
+                                    onPress={handleSignOut}
                                     className="
-                                        border
-                                        border-red-500/20
-                                        bg-red-500/10
-                                        text-red-400
-                                        transition-all
-                                        duration-300
-                                        hover:scale-105
-                                        hover:bg-red-500
-                                        hover:text-white
-                                    "
+        rounded-full
+        bg-transparent
+        text-zinc-400
+        transition-all
+        duration-300
+        hover:bg-white/10
+        hover:text-white
+    "
                                 >
-                                    Logout
+                                    <LogOut size={20} />
                                 </Button>
                             </div>
                         ) : (
@@ -271,31 +333,57 @@ const NavBar = () => {
                                         <Link
                                             href="/profile"
                                             className="
-                                                flex
-                                                items-center
-                                                gap-3
-                                                rounded-xl
-                                                border
-                                                border-white/10
-                                                bg-white/5
-                                                p-3
-                                                transition
-                                                hover:bg-white/10
-                                            "
+        flex
+        items-center
+        gap-4
+        rounded-xl
+        border
+        border-white/10
+        bg-white/5
+        p-4
+        transition-all
+        hover:bg-white/10
+    "
                                         >
-                                            <RxAvatar />
+                                            {user?.image ? (
+                                                <Image
+                                                    src={user.image}
+                                                    alt={user.name || "User"}
+                                                    width={48}
+                                                    height={48}
+                                                    className="rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div
+                                                    className="
+                flex
+                h-12
+                w-12
+                items-center
+                justify-center
+                rounded-full
+                bg-linear-to-r
+                from-violet-600
+                via-purple-600
+                to-fuchsia-600
+                font-bold
+                text-white
+            "
+                                                >
+                                                    {user?.name?.charAt(0)?.toUpperCase()}
+                                                </div>
+                                            )}
 
                                             <div>
                                                 <p className="font-medium text-white">
-                                                    {user.name}
+                                                    {user?.name}
                                                 </p>
 
                                                 <p className="text-xs text-zinc-400">
-                                                    View Profile
+                                                    {user?.email}
                                                 </p>
                                             </div>
                                         </Link>
-
                                         <Button
                                             onPress={
                                                 handleSignOut
