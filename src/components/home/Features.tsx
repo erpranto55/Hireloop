@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Search,
   Bookmark,
@@ -9,9 +10,16 @@ import {
   Building2,
   ChartColumn,
   Hexagon,
+  type LucideIcon,
 } from "lucide-react";
 
-const features = [
+interface Feature {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+const features: Feature[] = [
   {
     title: "Smart Search",
     description: "Find your ideal job with advanced filters.",

@@ -1,10 +1,17 @@
-
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Plus, Crown, BarChart3, Zap } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowRight, Plus, Crown, BarChart3, Zap, type LucideIcon } from "lucide-react";
 
-const plans = [
+interface PlanItem {
+  name: string;
+  price: number;
+  icon: LucideIcon;
+  featured: boolean;
+  features: string[];
+}
+
+const plans: PlanItem[] = [
   {
     name: "Starter",
     price: 0,
@@ -43,8 +50,10 @@ const plans = [
   },
 ];
 
+type BillingCycle = "monthly" | "yearly";
+
 export default function Pricing() {
-  const [billing, setBilling] = useState("yearly");
+  const [billing, setBilling] = useState<BillingCycle>("yearly");
 
   return (
     <section className="relative overflow-hidden bg-black pt-28 pb-10">
@@ -175,4 +184,3 @@ export default function Pricing() {
     </section>
   );
 }
-

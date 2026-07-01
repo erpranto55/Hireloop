@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -27,14 +27,14 @@ export default function SigninPage() {
         password: "",
     });
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
         }));
     };
 
-    const handleSignin = async (e) => {
+    const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const { email, password } = formData;
@@ -348,7 +348,12 @@ export default function SigninPage() {
     );
 }
 
-function Stat({ value, label }) {
+interface StatProps {
+    value: string;
+    label: string;
+}
+
+function Stat({ value, label }: StatProps) {
     return (
         <div className="rounded-2xl border border-white/10 bg-white/2 p-5">
             <div className="text-3xl font-bold text-white">

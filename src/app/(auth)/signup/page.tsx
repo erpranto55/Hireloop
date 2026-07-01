@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@heroui/react/button";
-
-import { Spinner } from "@heroui/react/spinner";
 
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
@@ -32,14 +30,14 @@ export default function SignupPage() {
         confirmPassword: "",
     });
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
         }));
     };
 
-    const handleSignup = async (e) => {
+    const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const {
@@ -202,7 +200,7 @@ export default function SignupPage() {
                                                     transition
                                                     focus:border-violet-500
                                                     focus:bg-white/10
-                                                  "
+                                                   "
                                     />
                                 </div>
 
@@ -232,7 +230,7 @@ export default function SignupPage() {
                                                     transition
                                                     focus:border-violet-500
                                                     focus:bg-white/10
-                                                  "
+                                                   "
                                     />
                                 </div>
 
@@ -409,7 +407,12 @@ export default function SignupPage() {
     );
 }
 
-function Stat({ value, label }) {
+interface StatProps {
+    value: string;
+    label: string;
+}
+
+function Stat({ value, label }: StatProps) {
     return (
         <div className="rounded-2xl border border-white/10 bg-white/2 p-5">
             <div className="text-3xl font-bold text-white">

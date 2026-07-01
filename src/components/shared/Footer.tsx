@@ -1,8 +1,14 @@
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaFacebookF, FaPinterestP, FaLinkedinIn } from "react-icons/fa";
 
-const productLinks = [
+interface FooterLink {
+  label: string;
+  href: string;
+}
+
+const productLinks: FooterLink[] = [
   {
     label: "Job Discovery",
     href: "/jobs",
@@ -21,7 +27,7 @@ const productLinks = [
   },
 ];
 
-const navigationLinks = [
+const navigationLinks: FooterLink[] = [
   {
     label: "Help Center",
     href: "/help-center",
@@ -36,7 +42,7 @@ const navigationLinks = [
   },
 ];
 
-const resourceLinks = [
+const resourceLinks: FooterLink[] = [
   {
     label: "Brand Guideline",
     href: "/brand-guideline",
@@ -190,4 +196,3 @@ export default function Footer() {
     </footer>
   );
 }
-

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
     Search,
     MapPin,
@@ -9,9 +10,16 @@ import {
     Users,
     Star,
     Sparkles,
+    type LucideIcon,
 } from "lucide-react";
 
-const stats = [
+interface StatItem {
+    icon: LucideIcon;
+    value: string;
+    label: string;
+}
+
+const stats: StatItem[] = [
     {
         icon: BriefcaseBusiness,
         value: "50K+",
@@ -34,7 +42,7 @@ const stats = [
     },
 ];
 
-const tags = [
+const tags: string[] = [
     "Product Designer",
     "AI Engineer",
     "Frontend",
@@ -42,12 +50,10 @@ const tags = [
     "Remote Jobs",
 ];
 
-
 export default function Hero() {
     return (
         <section className="relative overflow-hidden bg-black text-white">
             {/* Background */}
-
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.15),transparent_60%)]" />
 
             <div className="absolute inset-0 bg-[radial-gradient(circle,#ffffff08_1px,transparent_1px)] bg-size-[32px_32px] opacity-30" />
@@ -57,7 +63,6 @@ export default function Hero() {
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="max-w-6xl mx-auto pt-32 pb-24">
                     {/* Badge */}
-
                     <div className="flex justify-center">
                         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl px-4 py-2">
                             <Sparkles
@@ -71,7 +76,6 @@ export default function Hero() {
                     </div>
 
                     {/* Heading */}
-
                     <div className="mt-8 text-center">
                         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">
                             Find Your
@@ -88,7 +92,6 @@ export default function Hero() {
                     </div>
 
                     {/* Search */}
-
                     <div className="mt-12 max-w-5xl mx-auto">
                         <div className="rounded-3xl border border-white/10 bg-white/4 backdrop-blur-2xl p-3 shadow-[0_0_80px_rgba(139,92,246,0.15)]">
                             <div className="flex flex-col lg:flex-row gap-3">
@@ -125,7 +128,6 @@ export default function Hero() {
                     </div>
 
                     {/* Tags */}
-
                     <div className="mt-6 flex flex-wrap justify-center gap-3">
                         {tags.map((tag) => (
                             <button
@@ -138,16 +140,12 @@ export default function Hero() {
                     </div>
 
                     {/* Visual Section */}
-
                     <div className="relative mt-24">
-
                         {/* Glow */}
-
                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-62.5 bg-violet-600/20 blur-[120px] -z-10" />
                     </div>
 
                     {/* Stats */}
-
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-24">
                         {stats.map((item) => {
                             const Icon = item.icon;
@@ -175,7 +173,6 @@ export default function Hero() {
                     </div>
 
                     {/* Trust */}
-
                     <div className="mt-16 text-center">
                         <p className="text-gray-500 text-sm uppercase tracking-[0.25em]">
                             Trusted by teams worldwide

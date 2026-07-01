@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import { Link, Button } from "@heroui/react";
+import { Link } from "@heroui/react";
+import { Button } from "@heroui/react/button";
 import { Menu, X, LogOut } from "lucide-react";
-import { RxAvatar } from "react-icons/rx";
 
 import { toast } from "react-toastify";
 
@@ -227,7 +227,7 @@ const NavBar = () => {
 
                                 <Button
                                     isIconOnly
-                                    variant="light"
+                                    variant={"light" as any}
                                     onPress={handleSignOut}
                                     className="
         rounded-full
@@ -255,8 +255,8 @@ const NavBar = () => {
                                     href="/signup"
                                 >
                                     <Button
-                                        radius="lg"
                                         className="
+                                        rounded-xl
                                         bg-linear-to-r
                                         from-violet-600
                                         via-purple-600
@@ -356,19 +356,19 @@ const NavBar = () => {
                                             ) : (
                                                 <div
                                                     className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-full
-                bg-linear-to-r
-                from-violet-600
-                via-purple-600
-                to-fuchsia-600
-                font-bold
-                text-white
-            "
+                 flex
+                 h-12
+                 w-12
+                 items-center
+                 justify-center
+                 rounded-full
+                 bg-linear-to-r
+                 from-violet-600
+                 via-purple-600
+                 to-fuchsia-600
+                 font-bold
+                 text-white
+             "
                                                 >
                                                     {user?.name?.charAt(0)?.toUpperCase()}
                                                 </div>
@@ -384,43 +384,46 @@ const NavBar = () => {
                                                 </p>
                                             </div>
                                         </Link>
-                                        <Button
-                                            onPress={
-                                                handleSignOut
-                                            }
-                                            startContent={
-                                                <LogOut size={16} />
-                                            }
-                                            className="
-                                                border
-                                                border-red-500/20
-                                                bg-red-500/10
-                                                text-red-400
-                                                transition-all
-                                                hover:bg-red-500
-                                                hover:text-white
-                                            "
-                                        >
-                                            Logout
-                                        </Button>
+                                         <Button
+                                             onPress={
+                                                 handleSignOut
+                                             }
+                                             className="
+                                                 border
+                                                 border-red-500/20
+                                                 bg-red-500/10
+                                                 text-red-400
+                                                 transition-all
+                                                 hover:bg-red-500
+                                                 hover:text-white
+                                             "
+                                         >
+                                             <span className="flex items-center gap-2">
+                                                 <LogOut size={16} />
+                                                 Logout
+                                             </span>
+                                         </Button>
                                     </>
                                 ) : (
                                     <>
-                                        <Button
-                                            as={Link}
-                                            href="/signin"
-                                            variant="light"
-                                            className="text-indigo-400"
-                                        >
-                                            Sign In
-                                        </Button>
+                                         <Link
+                                             href="/signin"
+                                             className="w-full"
+                                         >
+                                             <Button
+                                                 variant={"light" as any}
+                                                 className="w-full text-indigo-400 bg-transparent hover:bg-white/10"
+                                             >
+                                                 Sign In
+                                             </Button>
+                                         </Link>
 
                                         <Link
                                             href="/signup"
                                         >
                                             <Button
-                                                radius="lg"
                                                 className="
+                                        rounded-xl
                                         bg-linear-to-r
                                         from-violet-600
                                         via-purple-600
@@ -451,4 +454,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-
