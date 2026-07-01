@@ -113,7 +113,8 @@ export default function SignupPage() {
                                     src="/images/logo.png"
                                     alt="HireLoop Logo"
                                     width={120}
-                                    height={120} />
+                                    height={120}
+                                    style={{ height: "auto" }} />
                             </Link>
 
                             <div className="my-7">

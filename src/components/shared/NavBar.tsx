@@ -116,6 +116,7 @@ const NavBar = () => {
                             alt="HireLoop Logo"
                             width={120}
                             height={120}
+                            style={{ height: "auto" }}
                         />
                     </Link>
 

@@ -73,7 +73,8 @@ export default function Footer() {
                   src="/images/logo.png"
                   alt="HireLoop Logo"
                   width={120}
-                  height={120} />
+                  height={120}
+                  style={{ height: "auto" }} />
               </Link>
 
               <p className="mt-6 max-w-xs text-sm leading-7 text-zinc-500 lg:max-w-sm">
