@@ -109,7 +109,7 @@ export default function SignupPage() {
                                 href="/"
                                 className="flex items-center"
                             >
-                                <Image
+                                <Image 
                                     src="/images/logo.png"
                                     alt="HireLoop Logo"
                                     width={120}
