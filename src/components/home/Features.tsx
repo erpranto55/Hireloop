@@ -115,6 +115,7 @@ export default function Features() {
                 </div>
 
                 {/* Content */}
+                
                 <div>
                   <h3 className="text-lg font-medium text-white">
                     {feature.title}
