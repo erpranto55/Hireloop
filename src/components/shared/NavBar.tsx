@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -133,11 +133,9 @@ const NavBar = () => {
 
                         <li>
                             <Link
-                                href="/company"
+                                href="/companies"
                                 className="text-sm text-white/70 transition hover:text-white"
-                            >
-                                Company
-                            </Link>
+                            >\n                                Companies\n                            </Link>
                         </li>
 
                         <li>
@@ -312,11 +310,9 @@ const NavBar = () => {
 
                             <li>
                                 <Link
-                                    href="/company"
+                                    href="/companies"
                                     className="py-3 text-white/80"
-                                >
-                                    Company
-                                </Link>
+                                >\n                                Companies\n                            </Link>
                             </li>
 
                             <li>
@@ -455,3 +451,4 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
