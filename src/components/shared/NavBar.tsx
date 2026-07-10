@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { Link } from "@heroui/react";
@@ -17,8 +17,11 @@ import {
 
 const NavBar = () => {
     const router = useRouter();
+    const pathname = usePathname();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    if (pathname.startsWith("/dashboard")) return null;
 
     const { data: session, isPending } =
         useSession();
@@ -451,4 +454,6 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
+
 

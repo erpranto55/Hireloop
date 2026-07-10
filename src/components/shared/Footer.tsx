@@ -1,6 +1,9 @@
+﻿"use client";
+
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FaFacebookF, FaPinterestP, FaLinkedinIn } from "react-icons/fa";
 
 interface FooterLink {
@@ -54,6 +57,9 @@ const resourceLinks: FooterLink[] = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/dashboard")) return null;
   return (
     <footer className="relative bg-black">
       {/* Top Glow Border */}
@@ -197,3 +203,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+
