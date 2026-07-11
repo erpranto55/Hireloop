@@ -136,7 +136,7 @@ function NavGroup({
       <div className="space-y-1">
         {links.map((link) => {
           const Icon = link.icon;
-          const active = pathname === link.href;
+          const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
 
           return (
             <Link
@@ -154,6 +154,7 @@ function NavGroup({
     </div>
   );
 }
+
 
 
 
