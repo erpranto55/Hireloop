@@ -21,7 +21,7 @@ export default function AdminDashboardPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/3 p-5">
               <Icon size={20} className="text-indigo-300" />
               <p className="mt-4 text-3xl font-semibold">{stat.value}</p>
               <p className="mt-1 text-sm text-zinc-500">{stat.label}</p>
@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section className="rounded-2xl border border-white/10 bg-white/3 p-6">
           <div className="flex items-center gap-2">
             <BarChart3 size={20} className="text-indigo-300" />
             <h2 className="text-2xl font-semibold">Jobs by Category</h2>
@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section className="rounded-2xl border border-white/10 bg-white/3 p-6">
           <h2 className="text-2xl font-semibold">Recent Payments</h2>
           <div className="mt-5 space-y-3">
             {["Pro", "Growth", "Premium", "Enterprise"].map((plan, index) => (
