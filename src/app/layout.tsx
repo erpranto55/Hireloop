@@ -1,19 +1,8 @@
-﻿import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
 import Footer from "@/components/shared/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "HireLoop",
@@ -26,24 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      data-theme="dark"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
-    >
+    <html lang="en" data-theme="dark" className="dark h-full antialiased">
       <body className="min-h-full flex flex-col">
         <NavBar />
         <main>{children}</main>
         <Footer />
-
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          theme="dark"
-          pauseOnHover
-        />
+        <ToastContainer position="top-right" autoClose={3000} theme="dark" pauseOnHover />
       </body>
     </html>
   );
 }
-
