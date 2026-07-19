@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -138,7 +138,9 @@ const NavBar = () => {
                             <Link
                                 href="/companies"
                                 className="text-sm text-white/70 transition hover:text-white"
-                            >\n                                Companies\n                            </Link>
+                            >
+                                Companies
+                            </Link>
                         </li>
 
                         <li>
@@ -315,7 +317,9 @@ const NavBar = () => {
                                 <Link
                                     href="/companies"
                                     className="py-3 text-white/80"
-                                >\n                                Companies\n                            </Link>
+                                >
+                                    Companies
+                                </Link>
                             </li>
 
                             <li>
