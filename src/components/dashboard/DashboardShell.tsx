@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import type React from "react";
+import { useEffect } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -54,18 +55,30 @@ const roleLinks = {
   ],
 };
 
-function getRole(pathname: string) {
-  if (pathname.includes("/dashboard/recruiter")) return "recruiter";
-  if (pathname.includes("/dashboard/admin")) return "admin";
-  return "seeker";
-}
-
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const role = getRole(pathname);
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const user = session?.user;
+  const role = ((user as any)?.role || "seeker") as "seeker" | "recruiter" | "admin";
+
+  useEffect(() => {
+    if (!isPending) {
+      if (!session) {
+        toast.error("Please sign in to access the dashboard");
+        router.push("/signin");
+      } else {
+        const userRole = (session.user as any)?.role || "seeker";
+        if (pathname.startsWith("/dashboard/recruiter") && userRole !== "recruiter") {
+          router.push(`/dashboard/${userRole}`);
+        } else if (pathname.startsWith("/dashboard/admin") && userRole !== "admin") {
+          router.push(`/dashboard/${userRole}`);
+        } else if (pathname.startsWith("/dashboard/seeker") && userRole !== "seeker") {
+          router.push(`/dashboard/${userRole}`);
+        }
+      }
+    }
+  }, [session, isPending, pathname, router]);
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -73,6 +86,21 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     router.push("/");
     router.refresh();
   };
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
+          <p className="text-sm font-medium text-zinc-400">Loading your space...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black text-white lg:grid lg:grid-cols-[300px_1fr]">

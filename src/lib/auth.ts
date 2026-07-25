@@ -18,4 +18,44 @@ export const auth = betterAuth({
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client
   }),
+
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "seeker",
+      },
+      status: {
+        type: "string",
+        required: false,
+        defaultValue: "active",
+      },
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "Free",
+      },
+      resumeUrl: {
+        type: "string",
+        required: false,
+      },
+      skills: {
+        type: "string",
+        required: false,
+      },
+      headline: {
+        type: "string",
+        required: false,
+      },
+      bio: {
+        type: "string",
+        required: false,
+      },
+      companyId: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
 });

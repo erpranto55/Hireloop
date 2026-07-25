@@ -28,9 +28,10 @@ export default function SignupPage() {
         email: "",
         password: "",
         confirmPassword: "",
+        role: "seeker",
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
@@ -45,6 +46,7 @@ export default function SignupPage() {
             email,
             password,
             confirmPassword,
+            role,
         } = formData;
 
         if (!name || !email || !password) {
@@ -65,6 +67,7 @@ export default function SignupPage() {
                     name,
                     email,
                     password,
+                    role,
                 });
 
             if (error) {
@@ -233,6 +236,38 @@ export default function SignupPage() {
                                                     focus:bg-white/10
                                                    "
                                     />
+                                </div>
+
+                                {/* Account Type */}
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-zinc-300">
+                                        Register As
+                                    </label>
+
+                                    <select
+                                        name="role"
+                                        value={formData.role}
+                                        onChange={handleChange}
+                                        className="
+                                                    h-12
+                                                    w-full
+                                                    rounded-xl
+                                                    border
+                                                    border-white/10
+                                                    bg-white/5
+                                                    px-4
+                                                    text-white
+                                                    outline-none
+                                                    transition
+                                                    focus:border-violet-500
+                                                    focus:bg-white/10
+                                                    appearance-none
+                                                   "
+                                        style={{ colorScheme: "dark" }}
+                                    >
+                                        <option value="seeker" className="bg-zinc-900 text-white">Job Seeker</option>
+                                        <option value="recruiter" className="bg-zinc-900 text-white">Recruiter</option>
+                                    </select>
                                 </div>
 
                                 {/* Password */}

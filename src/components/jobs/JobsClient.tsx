@@ -1,15 +1,34 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Briefcase, MapPin, Search, SlidersHorizontal, X } from "lucide-react";
-import { categories, jobs, jobTypes } from "@/data/mock";
+import { categories, jobTypes } from "@/data/mock";
 
 export default function JobsClient() {
+  const [dbJobs, setDbJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchJobs() {
+      try {
+        const res = await fetch("http://localhost:5001/api/jobs?limit=100");
+        if (res.ok) {
+          const data = await res.json();
+          setDbJobs(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch jobs:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchJobs();
+  }, []);
 
   const handleTypeToggle = (type: string) => {
     setSelectedTypes((prev) =>
@@ -18,13 +37,13 @@ export default function JobsClient() {
   };
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    return dbJobs.filter((job) => {
       // Keyword filter
       if (search.trim()) {
         const query = search.toLowerCase();
         const matchesKeyword =
           job.title.toLowerCase().includes(query) ||
-          job.company.toLowerCase().includes(query) ||
+          (job.companyName || job.company || "").toLowerCase().includes(query) ||
           job.location.toLowerCase().includes(query) ||
           job.category.toLowerCase().includes(query);
         if (!matchesKeyword) return false;
@@ -42,7 +61,7 @@ export default function JobsClient() {
 
       return true;
     });
-  }, [search, selectedCategory, selectedTypes]);
+  }, [dbJobs, search, selectedCategory, selectedTypes]);
 
   const hasActiveFilters =
     search !== "" || selectedCategory !== "All" || selectedTypes.length > 0;
@@ -157,14 +176,18 @@ export default function JobsClient() {
         <div className="flex items-center justify-between text-sm text-zinc-400">
           <span>
             Showing <strong className="text-white">{filteredJobs.length}</strong> of{" "}
-            <strong className="text-white">{jobs.length}</strong> jobs
+            <strong className="text-white">{dbJobs.length}</strong> jobs
           </span>
           {hasActiveFilters && (
             <span className="text-xs text-violet-400">Filters active</span>
           )}
         </div>
 
-        {filteredJobs.length === 0 ? (
+        {loading ? (
+          <div className="flex h-60 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02]">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+          </div>
+        ) : filteredJobs.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] py-16 text-center">
             <p className="text-lg font-medium text-white">No jobs found</p>
             <p className="mt-1 text-sm text-zinc-400">
@@ -180,16 +203,16 @@ export default function JobsClient() {
         ) : (
           filteredJobs.map((job) => (
             <Link
-              href={`/jobs/${job.id}`}
-              key={job.id}
+              href={`/jobs/${job._id || job.id}`}
+              key={job._id || job.id}
               className="group block rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md transition-all duration-300 hover:border-violet-500/40 hover:bg-white/[0.06] hover:shadow-lg hover:shadow-violet-500/5"
             >
               <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div className="flex gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-2">
                     <Image
-                      src={job.logo}
-                      alt={`${job.company} logo`}
+                      src={job.logo || "/logos/nvidia.png"}
+                      alt={`${job.companyName || job.company || "Company"} logo`}
                       width={42}
                       height={42}
                       className="h-auto w-auto object-contain"
@@ -199,7 +222,7 @@ export default function JobsClient() {
                     <h2 className="text-xl font-semibold text-white group-hover:text-violet-300 transition-colors">
                       {job.title}
                     </h2>
-                    <p className="mt-1 text-sm text-zinc-400">{job.company}</p>
+                    <p className="mt-1 text-sm text-zinc-400">{job.companyName || job.company}</p>
                     <div className="mt-3 flex flex-wrap gap-3 text-sm text-zinc-500">
                       <span className="flex items-center gap-1">
                         <MapPin size={15} /> {job.location}
@@ -212,7 +235,7 @@ export default function JobsClient() {
                 </div>
                 <div className="md:text-right">
                   <p className="font-semibold text-violet-400">{job.salary}</p>
-                  <p className="mt-1 text-sm text-zinc-500">Posted {job.posted}</p>
+                  <p className="mt-1 text-sm text-zinc-500">Posted {job.posted || "recently"}</p>
                 </div>
               </div>
             </Link>

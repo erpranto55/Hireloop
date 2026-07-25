@@ -1,35 +1,62 @@
-﻿import type React from "react";
+import type React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeDollarSign, Briefcase, CalendarDays, MapPin } from "lucide-react";
-import { jobs } from "@/data/mock";
+import ApplyButton from "@/components/jobs/ApplyButton";
 
 interface JobDetailsPageProps {
   params: Promise<{ jobId: string }>;
 }
 
-export function generateStaticParams() {
-  return jobs.map((job) => ({ jobId: job.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: JobDetailsPageProps) {
   const { jobId } = await params;
-  const job = jobs.find((item) => item.id === jobId);
+  try {
+    const res = await fetch(`http://localhost:5001/api/jobs/${jobId}`);
+    if (res.ok) {
+      const job = await res.json();
+      return {
+        title: `${job.title} | HireLoop`,
+        description: job.description || "View job details on HireLoop.",
+      };
+    }
+  } catch (e) {
+    console.error(e);
+  }
 
   return {
-    title: job ? `${job.title} | HireLoop` : "Job Details | HireLoop",
-    description: job?.description || "View job details on HireLoop.",
+    title: "Job Details | HireLoop",
+    description: "View job details on HireLoop.",
   };
 }
 
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
   const { jobId } = await params;
-  const job = jobs.find((item) => item.id === jobId);
+  let job: any = null;
+  let similarJobs: any[] = [];
+
+  try {
+    const res = await fetch(`http://localhost:5001/api/jobs/${jobId}`, { cache: "no-store" });
+    if (res.ok) {
+      job = await res.json();
+    }
+  } catch (err) {
+    console.error(err);
+  }
 
   if (!job) notFound();
 
-  const similarJobs = jobs.filter((item) => item.category === job.category && item.id !== job.id).slice(0, 3);
+  try {
+    const res = await fetch(`http://localhost:5001/api/jobs?category=${encodeURIComponent(job.category)}&limit=4`, { cache: "no-store" });
+    if (res.ok) {
+      const allJobs = await res.json();
+      similarJobs = allJobs.filter((item: any) => (item._id || item.id) !== jobId).slice(0, 3);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 
   return (
     <div className="min-h-screen bg-black px-6 pt-36 text-white lg:px-8">
@@ -42,7 +69,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
           <div>
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-3">
-                <Image src={job.logo} alt={`${job.company} logo`} width={48} height={48} className="h-auto w-auto object-contain" />
+                <Image src={job.logo || "/logos/nvidia.png"} alt={`${job.companyName || job.company || "Company"} logo`} width={48} height={48} className="h-auto w-auto object-contain" />
               </div>
               <div>
                 <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-300">
@@ -60,23 +87,29 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
               <Info icon={<CalendarDays size={18} />} label="Deadline" value={job.deadline} />
             </div>
 
-            <Section title="Responsibilities" items={job.responsibilities} />
-            <Section title="Requirements" items={job.requirements} />
-            <Section title="Benefits" items={job.benefits} />
+            {job.responsibilities && job.responsibilities.length > 0 && (
+              <Section title="Responsibilities" items={job.responsibilities} />
+            )}
+            {job.requirements && job.requirements.length > 0 && (
+              <Section title="Requirements" items={job.requirements} />
+            )}
+            {job.benefits && job.benefits.length > 0 && (
+              <Section title="Benefits" items={job.benefits} />
+            )}
           </div>
 
           <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <p className="text-sm text-zinc-500">Company</p>
-            <h2 className="mt-2 text-2xl font-semibold">{job.company}</h2>
+            <h2 className="mt-2 text-2xl font-semibold">{job.companyName || job.company}</h2>
             <p className="mt-4 text-sm leading-6 text-zinc-400">
               Applying requires a HireLoop account. Free plan users can apply to up to 3 jobs each month.
             </p>
-            <Link
-              href="/signin"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500"
-            >
-              Apply Now
-            </Link>
+            <ApplyButton
+              jobId={jobId}
+              jobTitle={job.title}
+              companyId={job.companyId}
+              companyName={job.companyName || job.company}
+            />
             <Link
               href={`/companies#${job.companyId}`}
               className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-white/10 px-5 py-3 font-semibold text-zinc-200 transition hover:bg-white/10"
@@ -91,9 +124,9 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
             <h2 className="text-2xl font-semibold">Similar jobs</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-3">
               {similarJobs.map((item) => (
-                <Link key={item.id} href={`/jobs/${item.id}`} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-indigo-500/40">
+                <Link key={item._id || item.id} href={`/jobs/${item._id || item.id}`} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-indigo-500/40">
                   <p className="font-semibold text-white">{item.title}</p>
-                  <p className="mt-2 text-sm text-zinc-400">{item.company}</p>
+                  <p className="mt-2 text-sm text-zinc-400">{item.companyName || item.company}</p>
                   <p className="mt-4 text-sm text-indigo-300">{item.salary}</p>
                 </Link>
               ))}

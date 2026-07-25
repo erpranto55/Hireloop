@@ -151,6 +151,17 @@ const NavBar = () => {
                                 Pricing
                             </Link>
                         </li>
+
+                        {user && (
+                            <li>
+                                <Link
+                                    href={`/dashboard/${(user as any).role || "seeker"}`}
+                                    className="text-sm font-semibold text-violet-400 transition hover:text-violet-300"
+                                >
+                                    Dashboard
+                                </Link>
+                            </li>
+                        )}
                     </ul>
 
                     {/* Desktop Actions */}
@@ -330,6 +341,17 @@ const NavBar = () => {
                                     Pricing
                                 </Link>
                             </li>
+
+                            {user && (
+                                <li>
+                                    <Link
+                                        href={`/dashboard/${(user as any).role || "seeker"}`}
+                                        className="py-3 font-semibold text-violet-400"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                </li>
+                            )}
 
                             <div className="mt-4 flex flex-col gap-3">
                                 {user ? (
