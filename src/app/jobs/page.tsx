@@ -17,6 +17,7 @@ export default function JobsPage() {
           <p className="mt-5 text-lg leading-8 text-zinc-400">
             Search curated opportunities across engineering, design, data, marketing, security, and developer relations.
           </p>
+          
         </div>
 
         <JobsClient />
