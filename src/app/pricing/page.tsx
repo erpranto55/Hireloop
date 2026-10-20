@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Check, HelpCircle } from "lucide-react";
 
 const seekerPlans = [
@@ -116,7 +116,10 @@ function PlanSection({ title, plans }: { title: string; plans: { name: string; p
                 </li>
               ))}
             </ul>
-            <Link href="/signup" className="mt-8 inline-flex w-full justify-center rounded-xl bg-white px-5 py-3 font-semibold text-black transition hover:bg-zinc-200">
+            <Link
+              href={plan.name === "Free" ? "/signup" : (title.toLowerCase().includes("recruiter") ? "/dashboard/recruiter/billing" : "/dashboard/seeker/billing")}
+              className="mt-8 inline-flex w-full justify-center rounded-xl bg-white px-5 py-3 font-semibold text-black transition hover:bg-zinc-200"
+            >
               Choose {plan.name}
             </Link>
           </article>
