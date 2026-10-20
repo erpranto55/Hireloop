@@ -6,6 +6,7 @@ import Image from "next/image";
 import { BarChart3, Briefcase, Building2, FileText, Plus, Users, AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function RecruiterDashboardPage() {
   const { data: session } = useSession();
@@ -19,26 +20,22 @@ export default function RecruiterDashboardPage() {
   useEffect(() => {
     const email = user?.email;
     if (email) {
+      const activeEmail: string = email;
       async function loadDashboardData() {
         try {
-          const [compRes, jobsRes, appsRes] = await Promise.all([
-            fetch(`http://localhost:5001/api/companies?recruiterEmail=${email}`),
-            fetch(`http://localhost:5001/api/jobs?recruiterEmail=${email}&status=all`),
-            fetch(`http://localhost:5001/api/applications?recruiterEmail=${email}`)
+          const [compData, jobsData, appsData] = await Promise.all([
+            apiFetch(`/api/companies?recruiterEmail=${encodeURIComponent(activeEmail)}`),
+            apiFetch(`/api/jobs?recruiterEmail=${encodeURIComponent(activeEmail)}&status=all`),
+            apiFetch(`/api/applications?recruiterEmail=${encodeURIComponent(activeEmail)}`)
           ]);
 
-          if (compRes.ok) {
-            const compData = await compRes.json();
-            if (compData && compData.length > 0) {
-              setCompany(compData[0]);
-            }
+          if (compData && compData.length > 0) {
+            setCompany(compData[0]);
           }
-          if (jobsRes.ok) {
-            const jobsData = await jobsRes.json();
+          if (jobsData) {
             setJobs(jobsData);
           }
-          if (appsRes.ok) {
-            const appsData = await appsRes.json();
+          if (appsData) {
             setApplications(appsData);
           }
         } catch (err) {

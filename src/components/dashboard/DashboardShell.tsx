@@ -60,25 +60,30 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
-  const role = ((user as any)?.role || "seeker") as "seeker" | "recruiter" | "admin";
+  const userRole = (((user as any)?.role || "seeker") as string).toLowerCase() as "seeker" | "recruiter" | "admin";
+  const role = userRole;
+  const isSuspended = (user as any)?.status === "suspended";
+
+  // Determine if user has permission to access the current dashboard route
+  const isRouteAuthorized = (() => {
+    if (!session) return false;
+    if (pathname.startsWith("/dashboard/admin")) return userRole === "admin";
+    if (pathname.startsWith("/dashboard/recruiter")) return userRole === "recruiter";
+    if (pathname.startsWith("/dashboard/seeker")) return userRole === "seeker";
+    return true;
+  })();
 
   useEffect(() => {
     if (!isPending) {
       if (!session) {
         toast.error("Please sign in to access the dashboard");
-        router.push("/signin");
-      } else {
-        const userRole = (session.user as any)?.role || "seeker";
-        if (pathname.startsWith("/dashboard/recruiter") && userRole !== "recruiter") {
-          router.push(`/dashboard/${userRole}`);
-        } else if (pathname.startsWith("/dashboard/admin") && userRole !== "admin") {
-          router.push(`/dashboard/${userRole}`);
-        } else if (pathname.startsWith("/dashboard/seeker") && userRole !== "seeker") {
-          router.push(`/dashboard/${userRole}`);
-        }
+        router.push(`/signin?callbackUrl=${encodeURIComponent(pathname)}`);
+      } else if (!isRouteAuthorized && !isSuspended) {
+        toast.warn(`Access restricted. Redirecting to your ${userRole} workspace.`);
+        router.replace(`/dashboard/${userRole}`);
       }
     }
-  }, [session, isPending, pathname, router]);
+  }, [session, isPending, pathname, router, isRouteAuthorized, userRole, isSuspended]);
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -100,6 +105,39 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   if (!session) {
     return null;
+  }
+
+  if (isSuspended) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
+        <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center backdrop-blur-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20 text-red-400">
+            <ShieldCheck size={28} />
+          </div>
+          <h2 className="mt-4 text-2xl font-bold text-white">Account Suspended</h2>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+            Your HireLoop account has been suspended by an administrator. If you believe this is in error, please contact support.
+          </p>
+          <button
+            onClick={handleSignOut}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500 cursor-pointer"
+          >
+            <LogOut size={16} /> Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isRouteAuthorized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-3 border-indigo-500 border-t-transparent" />
+          <p className="text-sm text-zinc-400">Redirecting to your authorized space...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

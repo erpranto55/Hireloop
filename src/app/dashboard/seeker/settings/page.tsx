@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function SeekerSettingsPage() {
   const router = useRouter();
@@ -44,22 +45,16 @@ export default function SeekerSettingsPage() {
         skills,
       };
 
-      const res = await fetch(`http://localhost:5001/api/users/${user.email}`, {
+      await apiFetch(`/api/users/${encodeURIComponent(user.email)}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        toast.success("Profile updated successfully!");
-        router.refresh();
-      } else {
-        const err = await res.json();
-        toast.error(err.message || "Failed to update profile");
-      }
-    } catch (err) {
+      toast.success("Profile updated successfully!");
+      router.refresh();
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }

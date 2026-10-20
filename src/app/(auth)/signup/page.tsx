@@ -41,21 +41,35 @@ export default function SignupPage() {
     const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const {
-            name,
-            email,
-            password,
-            confirmPassword,
-            role,
-        } = formData;
+        const name = formData.name.trim();
+        const email = formData.email.trim();
+        const password = formData.password;
+        const confirmPassword = formData.confirmPassword;
+        const role = ["seeker", "recruiter"].includes(formData.role) ? formData.role : "seeker";
 
-        if (!name || !email || !password) {
-            toast.error("Please fill all fields");
+        if (!name || !email || !password || !confirmPassword) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
+        if (name.length < 2) {
+            toast.error("Full name must be at least 2 characters.");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            toast.error("Please enter a valid email address.");
+            return;
+        }
+
+        if (password.length < 8) {
+            toast.error("Password must be at least 8 characters long.");
             return;
         }
 
         if (password !== confirmPassword) {
-            toast.error("Passwords do not match");
+            toast.error("Passwords do not match.");
             return;
         }
 
@@ -71,17 +85,17 @@ export default function SignupPage() {
                 });
 
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message || "Failed to create account. Please check your details.");
                 return;
             }
 
-            toast.success("Account created successfully");
+            toast.success("Account created successfully! Please sign in.");
 
             setTimeout(() => {
                 router.push("/signin");
-            }, 1200);
+            }, 1000);
         } catch {
-            toast.error("Something went wrong");
+            toast.error("An unexpected error occurred while creating your account.");
         } finally {
             setLoading(false);
         }

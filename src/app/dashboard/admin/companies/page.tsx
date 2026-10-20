@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Check, Eye, Search, X } from "lucide-react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function AdminCompaniesPage() {
   const [companies, setCompanies] = useState<any[]>([]);
@@ -12,14 +13,11 @@ export default function AdminCompaniesPage() {
 
   const fetchCompanies = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/companies");
-      if (res.ok) {
-        const data = await res.json();
-        setCompanies(data);
-      }
-    } catch (err) {
+      const data = await apiFetch("/api/companies?status=all");
+      setCompanies(data);
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to load companies");
+      toast.error(err.message || "Failed to load companies");
     } finally {
       setLoading(false);
     }
@@ -31,21 +29,16 @@ export default function AdminCompaniesPage() {
 
   const handleUpdateStatus = async (companyId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/companies/${companyId}`, {
+      await apiFetch(`/api/companies/${companyId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (res.ok) {
-        toast.success(`Company status updated to ${newStatus}`);
-        fetchCompanies();
-      } else {
-        toast.error("Failed to update company status");
-      }
-    } catch (err) {
+      toast.success(`Company status updated to ${newStatus}`);
+      fetchCompanies();
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "Failed to update company status");
     }
   };
 

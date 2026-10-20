@@ -1,4 +1,6 @@
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
+import { bearer } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
@@ -10,14 +12,85 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db(process.env.AUTH_DB_NAME || "hireloop");
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+
   emailAndPassword: { 
-    enabled: true, 
-  }, 
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+  },
+
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 60,
+    customRules: {
+      "/sign-in/email": {
+        window: 60,
+        max: 5,
+      },
+      "/sign-up/email": {
+        window: 60,
+        max: 5,
+      },
+    },
+  },
 
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
-    client
+    client,
   }),
+
+  plugins: [
+    bearer(),
+  ],
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Whitelist permitted self-registration roles: seeker or recruiter.
+          // Block privilege escalation to "admin" at registration.
+          const allowedRoles = ["seeker", "recruiter"];
+          const requestedRole = (user as any).role;
+          const role = allowedRoles.includes(requestedRole) ? requestedRole : "seeker";
+
+          return {
+            data: {
+              ...user,
+              role,
+              status: "active",
+              plan: "Free",
+            },
+          };
+        },
+      },
+      update: {
+        before: async (user) => {
+          // Prevent ordinary users from modifying role, status, or plan through user profile updates
+          const safeData = { ...user };
+          delete (safeData as any).role;
+          delete (safeData as any).status;
+          delete (safeData as any).plan;
+          return { data: safeData };
+        },
+      },
+    },
+    session: {
+      create: {
+        before: async (session, ctx) => {
+          if (!ctx) return;
+          const user = await ctx.context.internalAdapter.findUserById(session.userId);
+          if (user && (user as any).status === "suspended") {
+            throw APIError.from("FORBIDDEN", {
+              message: "Your account has been suspended. Please contact support.",
+              code: "ACCOUNT_SUSPENDED",
+            });
+          }
+        },
+      },
+    },
+  },
 
   user: {
     additionalFields: {

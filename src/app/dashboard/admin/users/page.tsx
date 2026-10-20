@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Ban, Search, ShieldCheck, UserCheck, CheckCircle } from "lucide-react";
+import { Ban, Search, ShieldCheck, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -11,14 +12,11 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/users");
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data);
-      }
-    } catch (err) {
+      const data = await apiFetch("/api/users");
+      setUsers(data);
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to load users list");
+      toast.error(err.message || "Failed to load users list");
     } finally {
       setLoading(false);
     }
@@ -31,42 +29,32 @@ export default function AdminUsersPage() {
   const handleToggleSuspend = async (email: string, currentStatus: string) => {
     const nextStatus = currentStatus === "suspended" ? "active" : "suspended";
     try {
-      const res = await fetch(`http://localhost:5001/api/users/${email}`, {
+      await apiFetch(`/api/users/${email}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
       });
 
-      if (res.ok) {
-        toast.success(`User standing updated to ${nextStatus}`);
-        fetchUsers();
-      } else {
-        toast.error("Failed to update user standing");
-      }
-    } catch (err) {
+      toast.success(`User standing updated to ${nextStatus}`);
+      fetchUsers();
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "Failed to update user standing");
     }
   };
 
   const handleMakeAdmin = async (email: string) => {
     if (!confirm("Are you sure you want to promote this user to Administrator?")) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/users/${email}`, {
+      await apiFetch(`/api/users/${email}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: "admin" }),
       });
 
-      if (res.ok) {
-        toast.success("User promoted to Admin");
-        fetchUsers();
-      } else {
-        toast.error("Failed to promote user");
-      }
-    } catch (err) {
+      toast.success("User promoted to Admin");
+      fetchUsers();
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "Failed to promote user");
     }
   };
 

@@ -21,10 +21,9 @@ const NavBar = () => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    if (pathname.startsWith("/dashboard")) return null;
+    const { data: session, isPending } = useSession();
 
-    const { data: session, isPending } =
-        useSession();
+    if (pathname.startsWith("/dashboard")) return null;
 
     const user = session?.user;
 

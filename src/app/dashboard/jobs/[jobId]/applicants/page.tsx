@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Mail, Calendar, FileText, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -29,21 +30,21 @@ export default function JobApplicantsPage({ params }: PageProps) {
       async function loadData() {
         try {
           // Fetch job title
-          const jobRes = await fetch(`http://localhost:5001/api/jobs/${jobId}`);
+          const jobRes = await apiFetch(`/api/jobs/${jobId}`);
           if (jobRes.ok) {
             const jobData = await jobRes.json();
             setJobTitle(jobData.title);
           }
 
           // Fetch applications
-          const appRes = await fetch(`http://localhost:5001/api/applications?jobId=${jobId}`);
+          const appRes = await apiFetch(`/api/applications?jobId=${jobId}`);
           if (appRes.ok) {
             const appData = await appRes.json();
             setApplicants(appData);
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error(err);
-          toast.error("Failed to load applicants information");
+          toast.error(err.message || "Failed to load applicants information");
         } finally {
           setLoading(false);
         }
@@ -54,9 +55,8 @@ export default function JobApplicantsPage({ params }: PageProps) {
 
   const handleStatusChange = async (appId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/applications/${appId}/status`, {
+      const res = await apiFetch(`/api/applications/${appId}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -66,11 +66,12 @@ export default function JobApplicantsPage({ params }: PageProps) {
           prev.map((app) => (app._id === appId ? { ...app, status: newStatus } : app))
         );
       } else {
-        toast.error("Failed to update status");
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to update status");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "An error occurred");
     }
   };
 

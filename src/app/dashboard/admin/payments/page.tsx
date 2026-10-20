@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CreditCard, Download, Search } from "lucide-react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -12,14 +13,11 @@ export default function AdminPaymentsPage() {
   useEffect(() => {
     async function fetchPayments() {
       try {
-        const res = await fetch("http://localhost:5001/api/payments");
-        if (res.ok) {
-          const data = await res.json();
-          setPayments(data);
-        }
-      } catch (err) {
+        const data = await apiFetch("/api/payments");
+        if (data) setPayments(data);
+      } catch (err: any) {
         console.error(err);
-        toast.error("Failed to load payments records");
+        toast.error(err.message || "Failed to load payments records");
       } finally {
         setLoading(false);
       }

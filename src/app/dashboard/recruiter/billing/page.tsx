@@ -5,6 +5,7 @@ import { Check, CreditCard, Sparkles, AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 export default function RecruiterBillingPage() {
   const router = useRouter();
@@ -23,8 +24,8 @@ export default function RecruiterBillingPage() {
       async function loadBillingData() {
         try {
           const [payRes, jobsRes] = await Promise.all([
-            fetch(`http://localhost:5001/api/payments?userEmail=${email}`),
-            fetch(`http://localhost:5001/api/jobs?recruiterEmail=${email}&status=all`)
+            apiFetch(`/api/payments?userEmail=${email}`),
+            apiFetch(`/api/jobs?recruiterEmail=${email}&status=all`)
           ]);
 
           if (payRes.ok) {
@@ -56,16 +57,15 @@ export default function RecruiterBillingPage() {
         transactionId: "txn_rec_" + Math.random().toString(36).substr(2, 9),
       };
 
-      const res = await fetch("http://localhost:5001/api/payments", {
+      const res = await apiFetch("/api/payments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         toast.success(`Successfully upgraded to ${planName}!`);
         // Refresh payments list
-        const payRes = await fetch(`http://localhost:5001/api/payments?userEmail=${user.email}`);
+        const payRes = await apiFetch(`/api/payments?userEmail=${user.email}`);
         if (payRes.ok) {
           const payData = await payRes.json();
           setPayments(payData);
@@ -73,11 +73,12 @@ export default function RecruiterBillingPage() {
         // Force refresh session
         router.refresh();
       } else {
-        toast.error("Failed to process mock payment");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to process mock payment");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "An error occurred");
     } finally {
       setUpgrading(false);
     }

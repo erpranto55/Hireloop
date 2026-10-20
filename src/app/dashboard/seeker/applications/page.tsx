@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/api";
 
 export default function ApplicationsPage() {
   const { data: session, isPending } = useSession();
@@ -17,7 +18,7 @@ export default function ApplicationsPage() {
     if (email) {
       async function fetchApplications() {
         try {
-          const res = await fetch(`http://localhost:5001/api/applications?seekerEmail=${email}`);
+          const res = await apiFetch(`/api/applications?seekerEmail=${email}`);
           if (res.ok) {
             const data = await res.json();
             setApplications(data);

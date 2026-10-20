@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { Button } from "@heroui/react/button";
 
@@ -14,8 +15,10 @@ import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 
-export default function SigninPage() {
+function SigninContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
     const [loading, setLoading] = useState(false);
 
@@ -37,10 +40,17 @@ export default function SigninPage() {
     const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const { email, password } = formData;
+        const email = formData.email.trim();
+        const password = formData.password;
 
         if (!email || !password) {
-            toast.error("Please fill all fields");
+            toast.error("Please fill in both email and password.");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            toast.error("Please enter a valid email address.");
             return;
         }
 
@@ -54,22 +64,20 @@ export default function SigninPage() {
                 });
 
             if (error) {
-                toast.error(
-                    error.message ||
-                    "Invalid email or password"
-                );
+                const message = error.message || "Invalid email or password";
+                toast.error(message);
                 return;
             }
 
             toast.success("Login successful");
 
             setTimeout(() => {
-                router.push("/");
-            }, 1000);
+                router.push(callbackUrl);
+                router.refresh();
+            }, 600);
         } catch (error) {
             console.error(error);
-
-            toast.error("Something went wrong");
+            toast.error("An unexpected error occurred during sign in.");
         } finally {
             setLoading(false);
         }
@@ -346,6 +354,18 @@ export default function SigninPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function SigninPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-black text-white">
+                <div className="h-10 w-10 animate-spin rounded-full border-3 border-violet-500 border-t-transparent" />
+            </div>
+        }>
+            <SigninContent />
+        </Suspense>
     );
 }
 

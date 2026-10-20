@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, Trash2 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function SavedJobsPage() {
   const { data: session, isPending } = useSession();
@@ -18,7 +19,7 @@ export default function SavedJobsPage() {
     if (email) {
       async function fetchSavedJobs() {
         try {
-          const res = await fetch(`http://localhost:5001/api/saved-jobs?seekerEmail=${email}`);
+          const res = await apiFetch(`/api/saved-jobs?seekerEmail=${email}`);
           if (res.ok) {
             const data = await res.json();
             setSavedJobs(data);
@@ -35,7 +36,7 @@ export default function SavedJobsPage() {
 
   const handleRemove = async (savedId: string) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/saved-jobs/${savedId}`, {
+      const res = await apiFetch(`/api/saved-jobs/${savedId}`, {
         method: "DELETE",
       });
       if (res.ok) {

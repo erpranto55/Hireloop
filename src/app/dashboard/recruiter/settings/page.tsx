@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 export default function RecruiterSettingsPage() {
   const router = useRouter();
@@ -28,22 +28,16 @@ export default function RecruiterSettingsPage() {
 
     try {
       setSaving(true);
-      const res = await fetch(`http://localhost:5001/api/users/${user.email}`, {
+      await apiFetch(`/api/users/${encodeURIComponent(user.email)}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, image }),
       });
 
-      if (res.ok) {
-        toast.success("Profile updated successfully!");
-        router.refresh();
-      } else {
-        const err = await res.json();
-        toast.error(err.message || "Failed to update profile");
-      }
-    } catch (err) {
+      toast.success("Profile updated successfully!");
+      router.refresh();
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }

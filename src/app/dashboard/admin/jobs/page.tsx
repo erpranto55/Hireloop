@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, Search, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function AdminJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -12,14 +13,11 @@ export default function AdminJobsPage() {
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/jobs?status=all&limit=100");
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data);
-      }
-    } catch (err) {
+      const data = await apiFetch("/api/jobs?status=all&limit=100");
+      setJobs(data);
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to load jobs");
+      toast.error(err.message || "Failed to load jobs");
     } finally {
       setLoading(false);
     }
@@ -32,19 +30,15 @@ export default function AdminJobsPage() {
   const handleDelete = async (jobId: string) => {
     if (!confirm("Are you sure you want to permanently delete this job listing?")) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs/${jobId}`, {
+      await apiFetch(`/api/jobs/${jobId}`, {
         method: "DELETE",
       });
 
-      if (res.ok) {
-        toast.success("Job vacancy deleted successfully");
-        setJobs((prev) => prev.filter((j) => j._id !== jobId));
-      } else {
-        toast.error("Failed to delete listing");
-      }
-    } catch (err) {
+      toast.success("Job vacancy deleted successfully");
+      setJobs((prev) => prev.filter((j) => j._id !== jobId));
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred");
+      toast.error(err.message || "Failed to delete listing");
     }
   };
 

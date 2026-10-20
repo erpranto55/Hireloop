@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Building2, Globe, MapPin, Users, AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function RecruiterCompanyPage() {
   const { data: session } = useSession();
@@ -27,7 +28,7 @@ export default function RecruiterCompanyPage() {
     const email = user?.email;
     if (!email) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/companies?recruiterEmail=${email}`);
+      const res = await apiFetch(`/api/companies?recruiterEmail=${email}`);
       if (res.ok) {
         const data = await res.json();
         if (data && data.length > 0) {
@@ -75,16 +76,14 @@ export default function RecruiterCompanyPage() {
       let res;
       if (company?._id) {
         // Edit Company
-        res = await fetch(`http://localhost:5001/api/companies/${company._id}`, {
+        res = await apiFetch(`/api/companies/${company._id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       } else {
         // Register Company
-        res = await fetch("http://localhost:5001/api/companies", {
+        res = await apiFetch("/api/companies", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       }
@@ -93,12 +92,12 @@ export default function RecruiterCompanyPage() {
         toast.success(company?._id ? "Company details updated" : "Company registered successfully!");
         fetchCompany();
       } else {
-        const err = await res.json();
-        toast.error(err.message || "Operation failed");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || err.message || "Operation failed");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Something went wrong");
     } finally {
       setSaving(false);
     }

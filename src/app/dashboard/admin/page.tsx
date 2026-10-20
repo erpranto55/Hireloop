@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BarChart3, Briefcase, Building2, CreditCard, ShieldCheck, Users } from "lucide-react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function AdminDashboardPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -15,17 +16,17 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadAdminData() {
       try {
-        const [uRes, cRes, jRes, pRes] = await Promise.all([
-          fetch("http://localhost:5001/api/users"),
-          fetch("http://localhost:5001/api/companies"),
-          fetch("http://localhost:5001/api/jobs?status=all&limit=100"),
-          fetch("http://localhost:5001/api/payments")
+        const [uData, cData, jData, pData] = await Promise.all([
+          apiFetch("/api/users"),
+          apiFetch("/api/companies?status=all"),
+          apiFetch("/api/jobs?status=all&limit=100"),
+          apiFetch("/api/payments")
         ]);
 
-        if (uRes.ok) setUsers(await uRes.json());
-        if (cRes.ok) setCompanies(await cRes.json());
-        if (jRes.ok) setJobs(await jRes.json());
-        if (pRes.ok) setPayments(await pRes.json());
+        if (uData) setUsers(uData);
+        if (cData) setCompanies(cData);
+        if (jData) setJobs(jData);
+        if (pData) setPayments(pData);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load administration data");

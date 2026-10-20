@@ -6,6 +6,7 @@ import { categories, jobTypes } from "@/data/mock";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 export default function NewJobPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function NewJobPage() {
     if (email) {
       async function loadCompany() {
         try {
-          const res = await fetch(`http://localhost:5001/api/companies?recruiterEmail=${email}`);
+          const res = await apiFetch(`/api/companies?recruiterEmail=${email}`);
           if (res.ok) {
             const data = await res.json();
             if (data && data.length > 0) {
@@ -86,9 +87,8 @@ export default function NewJobPage() {
         status: "active"
       };
 
-      const res = await fetch("http://localhost:5001/api/jobs", {
+      const res = await apiFetch("/api/jobs", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -96,12 +96,12 @@ export default function NewJobPage() {
         toast.success("Job vacancy published successfully!");
         router.push("/dashboard/recruiter/jobs");
       } else {
-        const err = await res.json();
-        toast.error(err.message || "Failed to publish job");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || err.message || "Failed to publish job");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Something went wrong");
     } finally {
       setPublishing(false);
     }
@@ -128,7 +128,7 @@ export default function NewJobPage() {
           <AlertCircle className="mx-auto text-red-400" size={36} />
           <h3 className="text-lg font-semibold text-white">No Company Registered</h3>
           <p className="text-sm text-zinc-400 max-w-md mx-auto">
-            You must register your company profile under the "My Company" tab and wait for Admin approval before you can post jobs.
+            You must register your company profile under the &quot;My Company&quot; tab and wait for Admin approval before you can post jobs.
           </p>
           <button
             onClick={() => router.push("/dashboard/recruiter/company")}

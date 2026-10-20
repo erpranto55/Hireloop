@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Eye, Plus, RotateCcw, Trash2, Users } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function RecruiterJobsPage() {
   const { data: session } = useSession();
@@ -18,14 +19,14 @@ export default function RecruiterJobsPage() {
     const email = user?.email;
     if (!email) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs?recruiterEmail=${email}&status=all`);
+      const res = await apiFetch(`/api/jobs?recruiterEmail=${email}&status=all`);
       if (res.ok) {
         const data = await res.json();
         setJobs(data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to load jobs");
+      toast.error(err.message || "Failed to load jobs");
     } finally {
       setLoading(false);
     }
@@ -38,9 +39,8 @@ export default function RecruiterJobsPage() {
   const handleToggleStatus = async (jobId: string, currentStatus: string) => {
     const nextStatus = currentStatus === "active" ? "closed" : "active";
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs/${jobId}`, {
+      const res = await apiFetch(`/api/jobs/${jobId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
       });
 
@@ -48,18 +48,19 @@ export default function RecruiterJobsPage() {
         toast.success(`Job listing is now ${nextStatus}`);
         fetchJobs();
       } else {
-        toast.error("Failed to update status");
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to update status");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Something went wrong");
     }
   };
 
   const handleDelete = async (jobId: string) => {
     if (!confirm("Are you sure you want to delete this job listing?")) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs/${jobId}`, {
+      const res = await apiFetch(`/api/jobs/${jobId}`, {
         method: "DELETE",
       });
 
@@ -67,11 +68,12 @@ export default function RecruiterJobsPage() {
         toast.success("Job listing deleted successfully");
         setJobs((prev) => prev.filter((j) => j._id !== jobId));
       } else {
-        toast.error("Failed to delete listing");
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to delete listing");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(err.message || "Something went wrong");
     }
   };
 
@@ -186,7 +188,7 @@ export default function RecruiterJobsPage() {
           </div>
         ) : (
           <div className="py-16 text-center text-sm text-zinc-500">
-            No job listings found. Click "Post New Job" to list your first vacancy.
+            No job listings found. Click &quot;Post New Job&quot; to list your first vacancy.
           </div>
         )}
       </div>

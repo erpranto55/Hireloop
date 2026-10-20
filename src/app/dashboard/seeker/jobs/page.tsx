@@ -6,6 +6,7 @@ import { Bookmark, Briefcase, Filter, MapPin, Send, Check } from "lucide-react";
 import { categories, jobTypes } from "@/data/mock";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api";
 
 export default function SeekerJobsPage() {
   const { data: session } = useSession();
@@ -25,7 +26,7 @@ export default function SeekerJobsPage() {
     const email = user?.email;
     async function loadJobsAndSaved() {
       try {
-        const jobsRes = await fetch("http://localhost:5001/api/jobs?limit=100");
+        const jobsRes = await apiFetch("/api/jobs?limit=100");
         let jobsData = [];
         if (jobsRes.ok) {
           jobsData = await jobsRes.json();
@@ -33,7 +34,7 @@ export default function SeekerJobsPage() {
         }
 
         if (email) {
-          const savedRes = await fetch(`http://localhost:5001/api/saved-jobs?seekerEmail=${email}`);
+          const savedRes = await apiFetch(`/api/saved-jobs?seekerEmail=${email}`);
           if (savedRes.ok) {
             const savedData = await savedRes.json();
             setSavedJobs(savedData);
@@ -63,7 +64,7 @@ export default function SeekerJobsPage() {
     try {
       if (existing) {
         // Unsave
-        const res = await fetch(`http://localhost:5001/api/saved-jobs/${existing._id}`, {
+        const res = await apiFetch(`/api/saved-jobs/${existing._id}`, {
           method: "DELETE",
         });
         if (res.ok) {
@@ -81,9 +82,8 @@ export default function SeekerJobsPage() {
           seekerEmail: user.email,
         };
 
-        const res = await fetch("http://localhost:5001/api/saved-jobs", {
+        const res = await apiFetch("/api/saved-jobs", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 

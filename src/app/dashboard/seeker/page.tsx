@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BarChart3, Bell, Briefcase, CalendarCheck, Heart, Trophy, User } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/api";
 
 export default function SeekerDashboardPage() {
   const { data: session } = useSession();
@@ -16,21 +17,16 @@ export default function SeekerDashboardPage() {
   useEffect(() => {
     const email = user?.email;
     if (email) {
+      const activeEmail: string = email;
       async function fetchData() {
         try {
-          const [savedRes, appsRes] = await Promise.all([
-            fetch(`http://localhost:5001/api/saved-jobs?seekerEmail=${email}`),
-            fetch(`http://localhost:5001/api/applications?seekerEmail=${email}`)
+          const [savedData, appsData] = await Promise.all([
+            apiFetch(`/api/saved-jobs?seekerEmail=${encodeURIComponent(activeEmail)}`),
+            apiFetch(`/api/applications?seekerEmail=${encodeURIComponent(activeEmail)}`)
           ]);
 
-          if (savedRes.ok) {
-            const savedData = await savedRes.json();
-            setSavedJobs(savedData);
-          }
-          if (appsRes.ok) {
-            const appsData = await appsRes.json();
-            setApplications(appsData);
-          }
+          if (savedData) setSavedJobs(savedData);
+          if (appsData) setApplications(appsData);
         } catch (err) {
           console.error("Error loading dashboard data:", err);
         } finally {

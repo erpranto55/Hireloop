@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { FileText, CheckCircle2, AlertCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 interface ApplyButtonProps {
   jobId: string;
@@ -26,27 +27,29 @@ export default function ApplyButton({ jobId, jobTitle, companyId, companyName }:
   const [resumeUrl, setResumeUrl] = useState("");
 
   useEffect(() => {
+    let active = true;
     const email = user?.email;
     if (email && isSeeker) {
+      const seekerEmail: string = email;
       async function checkApplication() {
         try {
-          const res = await fetch(`http://localhost:5001/api/applications?seekerEmail=${email}&jobId=${jobId}`);
-          if (res.ok) {
-            const apps = await res.json();
-            if (apps && apps.length > 0) {
-              setHasApplied(true);
-            }
+          const apps = await apiFetch(`/api/applications?seekerEmail=${encodeURIComponent(seekerEmail)}&jobId=${jobId}`);
+          if (active && apps && apps.length > 0) {
+            setHasApplied(true);
           }
         } catch (err) {
           console.error("Error checking application status:", err);
         } finally {
-          setCheckingStatus(false);
+          if (active) setCheckingStatus(false);
         }
       }
       checkApplication();
     } else {
       setCheckingStatus(false);
     }
+    return () => {
+      active = false;
+    };
   }, [user, isSeeker, jobId]);
 
   const handleApply = async (e: React.FormEvent) => {
@@ -72,23 +75,17 @@ export default function ApplyButton({ jobId, jobTitle, companyId, companyName }:
         status: "Applied",
       };
 
-      const res = await fetch("http://localhost:5001/api/applications", {
+      await apiFetch("/api/applications", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        toast.success("Application submitted successfully!");
-        setHasApplied(true);
-        setShowModal(false);
-      } else {
-        const errData = await res.json();
-        toast.error(errData.message || "Failed to submit application");
-      }
-    } catch (err) {
+      toast.success("Application submitted successfully!");
+      setHasApplied(true);
+      setShowModal(false);
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred. Please try again.");
+      toast.error(err.message || "Failed to submit application");
     } finally {
       setApplying(false);
     }
