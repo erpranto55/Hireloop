@@ -70,6 +70,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     if (pathname.startsWith("/dashboard/admin")) return userRole === "admin";
     if (pathname.startsWith("/dashboard/recruiter")) return userRole === "recruiter";
     if (pathname.startsWith("/dashboard/seeker")) return userRole === "seeker";
+    if (pathname.startsWith("/dashboard/jobs")) return userRole === "recruiter" || userRole === "admin";
     return true;
   })();
 

@@ -18,6 +18,41 @@ export default function SeekerSettingsPage() {
   const [resumeUrl, setResumeUrl] = useState("");
   const [skills, setSkills] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+
+  const handleResumeFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      toast.error("Only PDF files are supported.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size cannot exceed 5MB.");
+      return;
+    }
+
+    try {
+      setUploadingResume(true);
+      const formData = new FormData();
+      formData.append("resume", file);
+
+      const res = await apiFetch<{ url: string }>("/api/resumes/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      setResumeUrl(res.url);
+      toast.success("Resume uploaded successfully! Remember to click Save Profile.");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to upload resume.");
+    } finally {
+      setUploadingResume(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -147,19 +182,43 @@ export default function SeekerSettingsPage() {
         <aside className="space-y-6">
           <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-xl font-semibold">Resume</h2>
-            <div className="mt-4">
-              <label className="block text-sm text-zinc-500" htmlFor="resumeUrl">Resume PDF URL</label>
-              <input
-                id="resumeUrl"
-                type="url"
-                placeholder="https://drive.google.com/..."
-                value={resumeUrl}
-                onChange={(e) => setResumeUrl(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none focus:border-indigo-500"
-              />
-              <p className="mt-2 text-xs text-zinc-500">
-                Provide a shareable URL to your resume PDF (Google Drive, Dropbox, or personal site).
-              </p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm text-zinc-500 mb-2">Upload PDF File</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    id="settings-resume-upload"
+                    accept=".pdf,application/pdf"
+                    onChange={handleResumeFileUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="settings-resume-upload"
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-white/10 transition cursor-pointer"
+                  >
+                    {uploadingResume ? "Uploading..." : "Choose PDF..."}
+                  </label>
+                  {resumeUrl && (
+                    <span className="text-xs text-emerald-400 font-medium">✓ Resume on file</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-zinc-500" htmlFor="resumeUrl">Or Resume Link</label>
+                <input
+                  id="resumeUrl"
+                  type="text"
+                  placeholder="https://drive.google.com/... or /api/resumes/..."
+                  value={resumeUrl}
+                  onChange={(e) => setResumeUrl(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none focus:border-indigo-500"
+                />
+                <p className="mt-1 text-xs text-zinc-500">
+                  Direct shareable link or server-stored PDF reference.
+                </p>
+              </div>
             </div>
           </section>
 

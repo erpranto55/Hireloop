@@ -2,9 +2,27 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, FileText, Calendar, Building2 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
+
+function formatRelativeTime(dateInput: string | Date | undefined) {
+  if (!dateInput) return "Recently";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "Recently";
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays === 1) return "1 day ago";
+  if (diffInDays < 30) return `${diffInDays} days ago`;
+  return date.toLocaleDateString();
+}
 
 export default function ApplicationsPage() {
   const { data: session, isPending } = useSession();
@@ -16,9 +34,10 @@ export default function ApplicationsPage() {
   useEffect(() => {
     const email = user?.email;
     if (email) {
+      const seekerEmail: string = email;
       async function fetchApplications() {
         try {
-          const res = await apiFetch(`/api/applications?seekerEmail=${email}`);
+          const res = await apiFetch(`/api/applications?seekerEmail=${encodeURIComponent(seekerEmail)}`);
           if (res.ok) {
             const data = await res.json();
             setApplications(data);
@@ -53,33 +72,53 @@ export default function ApplicationsPage() {
         {applications.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[780px] text-left text-sm">
-              <thead className="border-b border-white/10 text-zinc-500">
+              <thead className="border-b border-white/10 text-zinc-500 bg-black/40">
                 <tr>
                   <th className="px-5 py-4 font-medium">Job Title</th>
                   <th className="px-5 py-4 font-medium">Company</th>
                   <th className="px-5 py-4 font-medium">Date Applied</th>
                   <th className="px-5 py-4 font-medium">Status</th>
-                  <th className="px-5 py-4 font-medium">Details</th>
+                  <th className="px-5 py-4 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
                 {applications.map((app) => (
-                  <tr key={app._id}>
+                  <tr key={app._id} className="hover:bg-white/[0.02] transition">
                     <td className="px-5 py-4 font-medium text-white">{app.jobTitle}</td>
-                    <td className="px-5 py-4 text-zinc-400">{app.companyName}</td>
-                    <td className="px-5 py-4 text-zinc-500">
-                      {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : "recently"}
+                    <td className="px-5 py-4 text-zinc-400">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 size={14} className="text-zinc-500" />
+                        {app.companyName}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-zinc-400">
+                      <span className="flex items-center gap-1.5" title={app.appliedAt ? new Date(app.appliedAt).toLocaleString() : ""}>
+                        <Calendar size={14} className="text-zinc-500" />
+                        {formatRelativeTime(app.appliedAt)}
+                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={app.status || "Applied"} />
                     </td>
                     <td className="px-5 py-4">
-                      <Link
-                        href={`/jobs/${app.jobId}`}
-                        className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-white/10 transition"
-                      >
-                        <Eye size={14} /> View
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/jobs/${app.jobId}`}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/10 transition"
+                        >
+                          <Eye size={13} /> View Listing
+                        </Link>
+                        {app.resumeUrl && (
+                          <a
+                            href={app.resumeUrl.startsWith("http") ? app.resumeUrl : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"}${app.resumeUrl}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-indigo-400 hover:bg-indigo-500/10 transition"
+                          >
+                            <FileText size={13} /> My Resume
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -105,14 +144,17 @@ export default function ApplicationsPage() {
 
 function StatusBadge({ status }: { status: string }) {
   let tone = "border-indigo-500/30 bg-indigo-500/10 text-indigo-300";
-  if (status === "Rejected") {
+  const s = (status || "Applied").toLowerCase();
+  if (s === "rejected") {
     tone = "border-red-500/30 bg-red-500/10 text-red-300";
-  } else if (status === "Offered") {
+  } else if (s === "offered" || s === "accepted") {
     tone = "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
-  } else if (status === "Shortlisted") {
+  } else if (s === "shortlisted") {
     tone = "border-violet-500/30 bg-violet-500/10 text-violet-300";
-  } else if (status === "Under Review") {
+  } else if (s === "interview scheduled") {
+    tone = "border-cyan-500/30 bg-cyan-500/10 text-cyan-300";
+  } else if (s === "under review") {
     tone = "border-amber-500/30 bg-amber-500/10 text-amber-300";
   }
-  return <span className={`rounded-full border px-3 py-1 text-xs ${tone}`}>{status}</span>;
+  return <span className={`rounded-full border px-3 py-1 text-xs font-medium ${tone}`}>{status}</span>;
 }
