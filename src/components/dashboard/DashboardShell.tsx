@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { authClient, useSession } from "@/lib/auth-client";
+import NotificationBell from "./NotificationBell";
 
 const publicLinks = [
   { label: "Home", href: "/", icon: Home },
@@ -148,9 +149,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           <Link href="/" className="inline-flex items-center">
             <Image src="/images/logo.png" alt="HireLoop" width={128} height={48} className="h-auto w-auto" />
           </Link>
-          <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs capitalize text-indigo-300 lg:hidden">
-            {role}
-          </span>
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <NotificationBell />
+            <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs capitalize text-indigo-300">
+              {role}
+            </span>
+          </div>
         </div>
 
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -181,8 +185,13 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         </button>
       </aside>
 
-      <main className="min-w-0 px-6 py-8 lg:px-10">
-        <div className="mx-auto max-w-7xl">{children}</div>
+      <main className="min-w-0 px-6 py-6 lg:px-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="hidden lg:flex items-center justify-end pb-4 mb-4 border-b border-white/5">
+            <NotificationBell />
+          </div>
+          {children}
+        </div>
       </main>
     </div>
   );
