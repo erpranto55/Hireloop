@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeDollarSign, Briefcase, CalendarDays, MapPin } from "lucide-react";
 import ApplyButton from "@/components/jobs/ApplyButton";
+import JobViewTracker from "@/components/jobs/JobViewTracker";
 
 interface JobDetailsPageProps {
   params: Promise<{ jobId: string }>;
@@ -60,6 +61,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
 
   return (
     <div className="min-h-screen bg-black px-6 pt-36 text-white lg:px-8">
+      <JobViewTracker jobId={jobId} />
       <article className="mx-auto max-w-6xl pb-20">
         <Link href="/jobs" className="inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-white">
           <ArrowLeft size={16} /> Back to jobs

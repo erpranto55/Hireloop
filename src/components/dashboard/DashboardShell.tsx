@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  BarChart3,
   Briefcase,
   Building2,
   CreditCard,
@@ -36,6 +37,7 @@ const roleLinks = {
     { label: "Browse & Apply", href: "/dashboard/seeker/jobs", icon: Briefcase },
     { label: "Saved Jobs", href: "/dashboard/seeker/saved", icon: Heart },
     { label: "Applications", href: "/dashboard/seeker/applications", icon: FileText },
+    { label: "Analytics", href: "/dashboard/seeker/analytics", icon: BarChart3 },
     { label: "Billing", href: "/dashboard/seeker/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/seeker/settings", icon: Settings },
   ],
@@ -43,6 +45,7 @@ const roleLinks = {
     { label: "Overview", href: "/dashboard/recruiter", icon: LayoutDashboard },
     { label: "My Company", href: "/dashboard/recruiter/company", icon: Building2 },
     { label: "Manage Jobs", href: "/dashboard/recruiter/jobs", icon: Briefcase },
+    { label: "Analytics", href: "/dashboard/recruiter/analytics", icon: BarChart3 },
     { label: "Billing", href: "/dashboard/recruiter/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/recruiter/settings", icon: Settings },
   ],
@@ -52,6 +55,7 @@ const roleLinks = {
     { label: "Companies", href: "/dashboard/admin/companies", icon: Building2 },
     { label: "Jobs", href: "/dashboard/admin/jobs", icon: Briefcase },
     { label: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
+    { label: "Audit Logs", href: "/dashboard/admin/audit", icon: ShieldCheck },
     { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },
   ],
 };
