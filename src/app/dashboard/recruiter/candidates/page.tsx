@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Filter,
@@ -22,6 +23,7 @@ import {
   MapPin,
   Phone,
   FileSearch,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { apiFetch } from "@/lib/api";
@@ -80,6 +82,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function RecruiterCandidatesPage() {
+  const router = useRouter();
   const { data: session, isPending: sessionPending } = useSession();
   const user = session?.user;
 
@@ -89,6 +92,24 @@ export default function RecruiterCandidatesPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [startingChatId, setStartingChatId] = useState<string | null>(null);
+
+  const handleStartChat = async (applicationId: string) => {
+    setStartingChatId(applicationId);
+    try {
+      const res = await apiFetch<{ conversation: { _id: string } }>("/api/messages/conversations", {
+        method: "POST",
+        body: JSON.stringify({ applicationId }),
+      });
+      if (res?.conversation?._id) {
+        router.push(`/dashboard/recruiter/messages?conversationId=${res.conversation._id}`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to open conversation. Ensure candidate application is shortlisted.");
+    } finally {
+      setStartingChatId(null);
+    }
+  };
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -516,6 +537,17 @@ export default function RecruiterCandidatesPage() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
+                    {/* Direct Message Button */}
+                    <button
+                      onClick={() => handleStartChat(candidate.applicationId)}
+                      disabled={startingChatId === candidate.applicationId}
+                      className="inline-flex items-center gap-1 rounded-md bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
+                      title="Message candidate"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-indigo-400" />
+                      Message
+                    </button>
+
                     {/* Direct Schedule Interview Button */}
                     <button
                       onClick={() => setSchedulingCandidate(candidate)}

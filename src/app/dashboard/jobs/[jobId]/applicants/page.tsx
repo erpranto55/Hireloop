@@ -21,6 +21,7 @@ import {
   Video,
   Phone,
   MapPin,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -89,6 +90,24 @@ export default function JobApplicantsPage({ params }: PageProps) {
   const [scheduleLocation, setScheduleLocation] = useState("HireLoop Virtual Meeting Room");
   const [scheduleAgenda, setScheduleAgenda] = useState("");
   const [submittingSchedule, setSubmittingSchedule] = useState(false);
+  const [startingChat, setStartingChat] = useState(false);
+
+  const handleStartChat = async (applicationId: string) => {
+    setStartingChat(true);
+    try {
+      const res = await apiFetch<{ conversation: { _id: string } }>("/api/messages/conversations", {
+        method: "POST",
+        body: JSON.stringify({ applicationId }),
+      });
+      if (res?.conversation?._id) {
+        router.push(`/dashboard/recruiter/messages?conversationId=${res.conversation._id}`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to open conversation. Ensure application is shortlisted.");
+    } finally {
+      setStartingChat(false);
+    }
+  };
 
   // Unwrap params
   useEffect(() => {
@@ -613,6 +632,18 @@ export default function JobApplicantsPage({ params }: PageProps) {
                       className="flex items-center gap-1.5 rounded-xl border border-indigo-500 bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition cursor-pointer"
                     >
                       <Calendar size={13} /> Schedule Interview
+                    </button>
+
+                    {/* Direct Message Candidate CTA */}
+                    <button
+                      type="button"
+                      disabled={startingChat}
+                      onClick={() => handleStartChat(selectedApp._id)}
+                      className="flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800 px-3.5 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-700 hover:text-white transition cursor-pointer disabled:opacity-50"
+                      title="Chat with candidate"
+                    >
+                      <MessageSquare size={13} className="text-indigo-400" />
+                      {startingChat ? "Opening Chat..." : "Message Candidate"}
                     </button>
 
                     {ALLOWED_TRANSITIONS[selectedApp.status || "Applied"]?.length ? (
