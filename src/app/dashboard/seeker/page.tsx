@@ -48,7 +48,7 @@ export default function SeekerDashboardPage() {
   // Calculate stats
   const savedCount = savedJobs.length;
   const appliedCount = applications.length;
-  const interviewCount = applications.filter(app => app.status === "Shortlisted").length;
+  const interviewCount = applications.filter(app => app.status === "Interview Scheduled").length;
   const offersCount = applications.filter(app => app.status === "Offered").length;
 
   const stats = [

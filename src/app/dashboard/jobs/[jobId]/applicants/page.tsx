@@ -15,7 +15,12 @@ import {
   Save,
   Clock,
   ExternalLink,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Send,
+  Video,
+  Phone,
+  MapPin,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -68,6 +73,23 @@ export default function JobApplicantsPage({ params }: PageProps) {
   const [savingNote, setSavingNote] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
+  // Resume Parsing Insights
+  const [parsedResume, setParsedResume] = useState<any | null>(null);
+  const [loadingParsed, setLoadingParsed] = useState(false);
+
+  // Interview Scheduling State
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [scheduleDuration, setScheduleDuration] = useState("45");
+  const [scheduleTimezone, setScheduleTimezone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+  );
+  const [scheduleFormat, setScheduleFormat] = useState<"video" | "in-person" | "phone">("video");
+  const [scheduleLocation, setScheduleLocation] = useState("HireLoop Virtual Meeting Room");
+  const [scheduleAgenda, setScheduleAgenda] = useState("");
+  const [submittingSchedule, setSubmittingSchedule] = useState(false);
+
   // Unwrap params
   useEffect(() => {
     params.then((p) => {
@@ -107,12 +129,86 @@ export default function JobApplicantsPage({ params }: PageProps) {
     }
   }, [jobId, sessionPending, userRole, router]);
 
-  // Sync selected app notes input
+  // Sync selected app notes and fetch parsed resume
   useEffect(() => {
     if (selectedApp) {
       setRecruiterNoteInput(selectedApp.recruiterNotes || "");
+      if (selectedApp.resumeFileId) {
+        setLoadingParsed(true);
+        apiFetch<any>(`/api/resumes/${selectedApp.resumeFileId}/parsed`)
+          .then((data) => setParsedResume(data))
+          .catch(() => setParsedResume(null))
+          .finally(() => setLoadingParsed(false));
+      } else {
+        setParsedResume(null);
+      }
+    } else {
+      setParsedResume(null);
     }
   }, [selectedApp]);
+
+  const handleTriggerParse = async () => {
+    if (!selectedApp?.resumeFileId) return;
+    try {
+      setLoadingParsed(true);
+      const res = await apiFetch<any>(`/api/resumes/${selectedApp.resumeFileId}/parse`, {
+        method: "POST",
+      });
+      setParsedResume(res.parsedResume);
+      toast.success("Resume parsed successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to parse resume.");
+    } finally {
+      setLoadingParsed(false);
+    }
+  };
+
+  const handleScheduleInterviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApp) return;
+
+    if (!scheduleDate || !scheduleTime) {
+      toast.error("Please provide an interview date and time.");
+      return;
+    }
+
+    try {
+      setSubmittingSchedule(true);
+      const scheduledDateTime = new Date(`${scheduleDate}T${scheduleTime}`);
+      if (isNaN(scheduledDateTime.getTime())) {
+        toast.error("Invalid interview date or time.");
+        return;
+      }
+
+      await apiFetch<any>("/api/interviews", {
+        method: "POST",
+        body: JSON.stringify({
+          applicationId: selectedApp._id,
+          scheduledAt: scheduledDateTime.toISOString(),
+          durationMinutes: Number(scheduleDuration),
+          timezone: scheduleTimezone,
+          format: scheduleFormat,
+          location: scheduleLocation,
+          agenda: scheduleAgenda,
+        }),
+      });
+
+      toast.success("Interview scheduled! Candidate notified via email & in-app.");
+      setShowScheduleModal(false);
+      setScheduleDate("");
+      setScheduleTime("");
+      setScheduleAgenda("");
+      // Update local status
+      setApplicants((prev) =>
+        prev.map((a) => (a._id === selectedApp._id ? { ...a, status: "Interview Scheduled" } : a))
+      );
+      setSelectedApp((prev: any) => ({ ...prev, status: "Interview Scheduled" }));
+    } catch (err: any) {
+      toast.error(err.message || "Failed to schedule interview.");
+    } finally {
+      setSubmittingSchedule(false);
+    }
+  };
 
   const handleStatusChange = async (appId: string, newStatus: string) => {
     try {
@@ -413,37 +509,112 @@ export default function JobApplicantsPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Resume Access */}
+                {/* Resume Access & Automated Parsing */}
                 <div>
-                  <h4 className="text-sm font-semibold text-white mb-2">Candidate Resume</h4>
-                  {selectedApp.resumeUrl ? (
-                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/40 p-3 text-sm">
-                      <div className="flex items-center gap-2 text-indigo-400">
-                        <FileText size={16} />
-                        <span className="font-medium">Attached PDF Resume</span>
-                      </div>
-                      <a
-                        href={
-                          selectedApp.resumeUrl.startsWith("http")
-                            ? selectedApp.resumeUrl
-                            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"}${selectedApp.resumeUrl}`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition"
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-white">Candidate Resume</h4>
+                    {selectedApp.resumeFileId && (
+                      <button
+                        type="button"
+                        onClick={handleTriggerParse}
+                        disabled={loadingParsed}
+                        className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition disabled:opacity-50"
                       >
-                        <ExternalLink size={13} /> View Resume
-                      </a>
+                        <Sparkles size={13} className={loadingParsed ? "animate-spin" : ""} />
+                        {loadingParsed ? "Parsing PDF..." : parsedResume ? "Re-parse Resume" : "Extract Resume Insights"}
+                      </button>
+                    )}
+                  </div>
+                  {selectedApp.resumeUrl ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/40 p-3 text-sm">
+                        <div className="flex items-center gap-2 text-indigo-400">
+                          <FileText size={16} />
+                          <span className="font-medium">Attached PDF Resume</span>
+                        </div>
+                        <a
+                          href={
+                            selectedApp.resumeUrl.startsWith("http")
+                              ? selectedApp.resumeUrl
+                              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001"}${selectedApp.resumeUrl}`
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition"
+                        >
+                          <ExternalLink size={13} /> View Resume
+                        </a>
+                      </div>
+
+                      {/* Structured Parsed Data Card */}
+                      {parsedResume?.data && (
+                        <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-4 text-xs space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-indigo-300 flex items-center gap-1.5">
+                              <Sparkles size={13} />
+                              Parsed Resume Insights
+                            </span>
+                            <span className="text-[10px] text-zinc-500">Automated Extraction</span>
+                          </div>
+
+                          <div className="rounded border border-amber-500/20 bg-amber-500/10 p-2 text-[11px] text-amber-300 flex items-start gap-1.5">
+                            <AlertCircle size={13} className="shrink-0 mt-0.5" />
+                            <span>{parsedResume.disclaimer || "Extracted via automated document parsing. Not independently verified."}</span>
+                          </div>
+
+                          {parsedResume.data.skills?.length > 0 && (
+                            <div>
+                              <span className="text-zinc-400 block mb-1 font-medium">Extracted Skills:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {parsedResume.data.skills.map((sk: string, i: number) => (
+                                  <span key={i} className="rounded bg-indigo-900/50 border border-indigo-700/50 px-2 py-0.5 text-indigo-200 text-[11px]">
+                                    {sk}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {parsedResume.data.education?.length > 0 && (
+                            <div>
+                              <span className="text-zinc-400 block mb-1 font-medium">Education Credentials:</span>
+                              <div className="flex flex-wrap gap-1 text-zinc-300">
+                                {parsedResume.data.education.map((e: string, i: number) => (
+                                  <span key={i} className="rounded bg-zinc-800 px-2 py-0.5 text-[11px]">{e}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {parsedResume.data.summary && (
+                            <div>
+                              <span className="text-zinc-400 block mb-1 font-medium">Extracted Summary:</span>
+                              <p className="rounded bg-black/60 p-2.5 text-zinc-300 italic border border-white/5">
+                                &quot;{parsedResume.data.summary}&quot;
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <p className="text-xs text-zinc-500 italic">No resume attached to this application.</p>
                   )}
                 </div>
 
-                {/* Status Transition Control */}
+                {/* Status Transition Control & Interview Scheduling */}
                 <div>
-                  <h4 className="text-sm font-semibold text-white mb-2">Hiring Stage Workflow</h4>
+                  <h4 className="text-sm font-semibold text-white mb-2">Hiring Stage & Interview Actions</h4>
                   <div className="flex flex-wrap items-center gap-2">
+                    {/* Direct Interview Scheduling CTA */}
+                    <button
+                      type="button"
+                      onClick={() => setShowScheduleModal(true)}
+                      className="flex items-center gap-1.5 rounded-xl border border-indigo-500 bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition cursor-pointer"
+                    >
+                      <Calendar size={13} /> Schedule Interview
+                    </button>
+
                     {ALLOWED_TRANSITIONS[selectedApp.status || "Applied"]?.length ? (
                       ALLOWED_TRANSITIONS[selectedApp.status || "Applied"].map((targetStatus) => (
                         <button
@@ -493,6 +664,148 @@ export default function JobApplicantsPage({ params }: PageProps) {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Schedule Interview Modal */}
+        {showScheduleModal && selectedApp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
+            <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950 p-6 md:p-8">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600/20 text-indigo-400">
+                    <Calendar size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Schedule Interview</h3>
+                    <p className="text-xs text-zinc-400">Candidate: {selectedApp.seekerName}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowScheduleModal(false)}
+                  className="rounded-lg p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white transition cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleScheduleInterviewSubmit} className="mt-5 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-400 mb-1">Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={scheduleDate}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-400 mb-1">Time *</label>
+                    <input
+                      type="time"
+                      required
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-400 mb-1">Duration</label>
+                    <select
+                      value={scheduleDuration}
+                      onChange={(e) => setScheduleDuration(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
+                    >
+                      <option value="15">15 mins</option>
+                      <option value="30">30 mins</option>
+                      <option value="45">45 mins</option>
+                      <option value="60">60 mins</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-400 mb-1">Timezone</label>
+                    <input
+                      type="text"
+                      value={scheduleTimezone}
+                      onChange={(e) => setScheduleTimezone(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Format</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["video", "phone", "in-person"] as const).map((fmt) => (
+                      <button
+                        type="button"
+                        key={fmt}
+                        onClick={() => {
+                          setScheduleFormat(fmt);
+                          if (fmt === "video") setScheduleLocation("HireLoop Virtual Meeting Room");
+                          else if (fmt === "phone") setScheduleLocation("Recruiter will dial candidate");
+                          else setScheduleLocation("Company HQ");
+                        }}
+                        className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium border transition ${
+                          scheduleFormat === fmt
+                            ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
+                            : "bg-black/60 border-white/10 text-zinc-400 hover:bg-white/5"
+                        }`}
+                      >
+                        {fmt === "video" && <Video size={13} />}
+                        {fmt === "phone" && <Phone size={13} />}
+                        {fmt === "in-person" && <MapPin size={13} />}
+                        <span className="capitalize">{fmt}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Location / Link</label>
+                  <input
+                    type="text"
+                    value={scheduleLocation}
+                    onChange={(e) => setScheduleLocation(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Agenda / Instructions</label>
+                  <textarea
+                    rows={2}
+                    value={scheduleAgenda}
+                    onChange={(e) => setScheduleAgenda(e.target.value)}
+                    placeholder="Candidate preparation notes or agenda..."
+                    className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500 resize-none"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setShowScheduleModal(false)}
+                    className="rounded-xl border border-white/10 px-4 py-2 text-xs font-medium text-zinc-400 hover:bg-white/5 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingSchedule}
+                    className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-50"
+                  >
+                    <Send size={13} />
+                    {submittingSchedule ? "Scheduling..." : "Send Invitation"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
