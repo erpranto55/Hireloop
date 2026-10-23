@@ -5,6 +5,7 @@ import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import NotificationPreferencesCenter from "@/components/dashboard/NotificationPreferencesCenter";
 
 export default function RecruiterSettingsPage() {
   const router = useRouter();
@@ -121,6 +122,10 @@ export default function RecruiterSettingsPage() {
           </button>
         </aside>
       </form>
+
+      <div className="mt-12 border-t border-white/10 pt-10">
+        <NotificationPreferencesCenter />
+      </div>
     </div>
   );
 }

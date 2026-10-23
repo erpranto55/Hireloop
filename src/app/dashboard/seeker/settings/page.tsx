@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import { apiFetch } from "@/lib/api";
+import NotificationPreferencesCenter from "@/components/dashboard/NotificationPreferencesCenter";
 
 export default function SeekerSettingsPage() {
   const router = useRouter();
@@ -247,10 +248,14 @@ export default function SeekerSettingsPage() {
             disabled={saving}
             className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-50 cursor-pointer"
           >
-            {saving ? "Saving Changes..." : "Save Changes"}
+            {saving ? "Saving Changes..." : "Save Profile Details"}
           </button>
         </div>
       </form>
+
+      <div className="mt-12 border-t border-white/10 pt-10">
+        <NotificationPreferencesCenter />
+      </div>
     </div>
   );
 }
