@@ -15,6 +15,9 @@ import {
   ExternalLink,
   Wifi,
   WifiOff,
+  Clock,
+  Calendar,
+  MessageSquare,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
@@ -56,6 +59,12 @@ function getNotificationIcon(type: string) {
       return <Briefcase size={16} className="text-indigo-400" />;
     case "application_status_changed":
       return <FileText size={16} className="text-emerald-400" />;
+    case "interview_reminder_24h":
+      return <Calendar size={16} className="text-indigo-400" />;
+    case "interview_reminder_1h":
+      return <Clock size={16} className="text-amber-400" />;
+    case "unread_messages_digest":
+      return <MessageSquare size={16} className="text-violet-400" />;
     case "subscription_activated":
     case "payment_succeeded":
       return <CreditCard size={16} className="text-violet-400" />;
@@ -363,6 +372,13 @@ export default function NotificationBell() {
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Footer Status */}
+          <div className="border-t border-white/5 bg-white/[0.01] px-4 py-2.5 text-center">
+            <span className="text-[10px] text-zinc-500">
+              Scheduled 24h &amp; 1h interview reminders and offline digests active
+            </span>
           </div>
         </div>
       )}
