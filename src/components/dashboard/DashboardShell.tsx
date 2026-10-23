@@ -20,6 +20,8 @@ import {
   MessageSquare,
   Settings,
   ShieldCheck,
+  AlertTriangle,
+  Megaphone,
   Users,
 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -60,6 +62,8 @@ const roleLinks = {
     { label: "Users", href: "/dashboard/admin/users", icon: Users },
     { label: "Companies", href: "/dashboard/admin/companies", icon: Building2 },
     { label: "Jobs", href: "/dashboard/admin/jobs", icon: Briefcase },
+    { label: "Moderation", href: "/dashboard/admin/moderation", icon: AlertTriangle },
+    { label: "Announcements", href: "/dashboard/admin/announcements", icon: Megaphone },
     { label: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
     { label: "Audit Logs", href: "/dashboard/admin/audit", icon: ShieldCheck },
     { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },

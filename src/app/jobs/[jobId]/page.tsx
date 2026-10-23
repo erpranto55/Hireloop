@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeDollarSign, Briefcase, CalendarDays, MapPin } from "lucide-react";
 import ApplyButton from "@/components/jobs/ApplyButton";
 import JobViewTracker from "@/components/jobs/JobViewTracker";
+import ReportJobButton from "@/components/jobs/ReportJobButton";
 
 interface JobDetailsPageProps {
   params: Promise<{ jobId: string }>;
@@ -118,6 +119,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
             >
               View Company
             </Link>
+            <ReportJobButton jobId={jobId} jobTitle={job.title} />
           </aside>
         </div>
 
