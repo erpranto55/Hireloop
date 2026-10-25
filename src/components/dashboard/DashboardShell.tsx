@@ -76,13 +76,45 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const userRole = (((user as any)?.role || "seeker") as string).toLowerCase() as "seeker" | "recruiter" | "admin";
+  const adminRole = ((user as any)?.adminRole || "super_admin").toLowerCase();
   const role = userRole;
   const isSuspended = (user as any)?.status === "suspended";
+
+  // Filter admin links dynamically based on specialized administrative role
+  const activeAdminLinks = roleLinks.admin.filter((link) => {
+    if (adminRole === "super_admin") return true;
+    if (link.href === "/dashboard/admin") return true;
+
+    if (adminRole === "support_moderator") {
+      return ["/dashboard/admin/moderation", "/dashboard/admin/companies", "/dashboard/admin/jobs"].includes(link.href);
+    }
+    if (adminRole === "compliance_officer") {
+      return ["/dashboard/admin/moderation", "/dashboard/admin/companies", "/dashboard/admin/audit"].includes(link.href);
+    }
+    if (adminRole === "billing_admin") {
+      return ["/dashboard/admin/payments", "/dashboard/admin/audit"].includes(link.href);
+    }
+    return false;
+  });
 
   // Determine if user has permission to access the current dashboard route
   const isRouteAuthorized = (() => {
     if (!session) return false;
-    if (pathname.startsWith("/dashboard/admin")) return userRole === "admin";
+    if (pathname.startsWith("/dashboard/admin")) {
+      if (userRole !== "admin") return false;
+      if (adminRole === "super_admin") return true;
+      if (pathname === "/dashboard/admin") return true;
+      if (adminRole === "support_moderator") {
+        return ["/dashboard/admin/moderation", "/dashboard/admin/companies", "/dashboard/admin/jobs"].some((p) => pathname.startsWith(p));
+      }
+      if (adminRole === "compliance_officer") {
+        return ["/dashboard/admin/moderation", "/dashboard/admin/companies", "/dashboard/admin/audit"].some((p) => pathname.startsWith(p));
+      }
+      if (adminRole === "billing_admin") {
+        return ["/dashboard/admin/payments", "/dashboard/admin/audit"].some((p) => pathname.startsWith(p));
+      }
+      return false;
+    }
     if (pathname.startsWith("/dashboard/recruiter")) return userRole === "recruiter";
     if (pathname.startsWith("/dashboard/seeker")) return userRole === "seeker";
     if (pathname.startsWith("/dashboard/jobs")) return userRole === "recruiter" || userRole === "admin";
@@ -182,12 +214,27 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             </div>
           </div>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs capitalize text-zinc-300">
-            <ShieldCheck size={14} /> {role}
+            <ShieldCheck size={14} />{" "}
+            {role === "admin"
+              ? adminRole === "super_admin"
+                ? "Super Administrator"
+                : adminRole === "support_moderator"
+                ? "Support Moderator"
+                : adminRole === "compliance_officer"
+                ? "Compliance Officer"
+                : adminRole === "billing_admin"
+                ? "Billing Administrator"
+                : "Administrator"
+              : role}
           </div>
         </div>
 
         <nav className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-1">
-          <NavGroup title="Dashboard" links={roleLinks[role]} pathname={pathname} />
+          <NavGroup
+            title="Dashboard"
+            links={role === "admin" ? activeAdminLinks : roleLinks[role]}
+            pathname={pathname}
+          />
           <NavGroup title="Public" links={publicLinks} pathname={pathname} />
         </nav>
 
