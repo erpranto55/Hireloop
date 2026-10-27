@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   Megaphone,
   Users,
+  UserCheck,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { authClient, useSession } from "@/lib/auth-client";
@@ -50,6 +51,7 @@ const roleLinks = {
   recruiter: [
     { label: "Overview", href: "/dashboard/recruiter", icon: LayoutDashboard },
     { label: "My Company", href: "/dashboard/recruiter/company", icon: Building2 },
+    { label: "Team Workspace", href: "/dashboard/recruiter/team", icon: UserCheck },
     { label: "Manage Jobs", href: "/dashboard/recruiter/jobs", icon: Briefcase },
     { label: "Candidates", href: "/dashboard/recruiter/candidates", icon: Users },
     { label: "Messages", href: "/dashboard/recruiter/messages", icon: MessageSquare },

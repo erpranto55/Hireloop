@@ -22,6 +22,7 @@ import {
   Phone,
   MapPin,
   MessageSquare,
+  UserCheck,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -91,6 +92,8 @@ export default function JobApplicantsPage({ params }: PageProps) {
   const [scheduleAgenda, setScheduleAgenda] = useState("");
   const [submittingSchedule, setSubmittingSchedule] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
+  const [companyMembers, setCompanyMembers] = useState<any[]>([]);
+  const [assigningReviewer, setAssigningReviewer] = useState(false);
 
   const handleStartChat = async (applicationId: string) => {
     setStartingChat(true);
@@ -152,6 +155,11 @@ export default function JobApplicantsPage({ params }: PageProps) {
   useEffect(() => {
     if (selectedApp) {
       setRecruiterNoteInput(selectedApp.recruiterNotes || "");
+      if (selectedApp.companyId) {
+        apiFetch<any>(`/api/companies/${selectedApp.companyId}/team`)
+          .then((data) => setCompanyMembers(data?.members || []))
+          .catch(() => setCompanyMembers([]));
+      }
       if (selectedApp.resumeFileId) {
         setLoadingParsed(true);
         apiFetch<any>(`/api/resumes/${selectedApp.resumeFileId}/parsed`)
@@ -165,6 +173,36 @@ export default function JobApplicantsPage({ params }: PageProps) {
       setParsedResume(null);
     }
   }, [selectedApp]);
+
+  const handleAssignReviewer = async (applicationId: string, reviewerEmail: string) => {
+    setAssigningReviewer(true);
+    try {
+      const res = await apiFetch(`/api/applications/${applicationId}/assign`, {
+        method: "PATCH",
+        body: JSON.stringify({ reviewerEmail: reviewerEmail || null }),
+      });
+      if (res.ok) {
+        toast.success(reviewerEmail ? `Reviewer assigned: ${reviewerEmail}` : "Reviewer unassigned");
+        const matched = companyMembers.find((m: any) => m.userEmail?.toLowerCase() === reviewerEmail.toLowerCase());
+        setSelectedApp((prev: any) => prev ? ({
+          ...prev,
+          assignedReviewerEmail: reviewerEmail || null,
+          assignedReviewerName: matched?.userName || reviewerEmail || null,
+        }) : null);
+        const appData = await apiFetch(`/api/applications?jobId=${jobId}`);
+        if (Array.isArray(appData)) {
+          setApplicants(appData);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.message || "Failed to assign reviewer.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong.");
+    } finally {
+      setAssigningReviewer(false);
+    }
+  };
 
   const handleTriggerParse = async () => {
     if (!selectedApp?.resumeFileId) return;
@@ -390,8 +428,16 @@ export default function JobApplicantsPage({ params }: PageProps) {
                             </div>
                             <div>
                               <span className="font-semibold text-white">{app.seekerName}</span>
+                              {app.assignedReviewerEmail && (
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 rounded font-mono">
+                                    <UserCheck size={10} />
+                                    {app.assignedReviewerName || app.assignedReviewerEmail}
+                                  </span>
+                                </div>
+                              )}
                               {app.recruiterNotes && (
-                                <p className="text-[11px] text-amber-400 font-medium truncate max-w-[180px]">
+                                <p className="text-[11px] text-amber-400 font-medium truncate max-w-[180px] mt-0.5">
                                   Note: {app.recruiterNotes}
                                 </p>
                               )}
@@ -662,6 +708,38 @@ export default function JobApplicantsPage({ params }: PageProps) {
                         This application is in a terminal stage ({selectedApp.status}).
                       </p>
                     )}
+                  </div>
+                </div>
+
+                {/* Reviewer Assignment */}
+                <div className="border-t border-white/10 pt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                      <UserCheck size={15} className="text-indigo-400" />
+                      Assigned Reviewer
+                    </h4>
+                    {selectedApp.assignedReviewerEmail ? (
+                      <span className="text-xs font-mono text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                        {selectedApp.assignedReviewerName || selectedApp.assignedReviewerEmail}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-zinc-500 italic">Unassigned</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedApp.assignedReviewerEmail || ""}
+                      onChange={(e) => handleAssignReviewer(selectedApp._id, e.target.value)}
+                      disabled={assigningReviewer}
+                      className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 outline-none focus:border-indigo-500 cursor-pointer"
+                    >
+                      <option value="">Unassigned (No specific reviewer)</option>
+                      {companyMembers.map((m: any) => (
+                        <option key={m._id} value={m.userEmail}>
+                          {m.userName || m.userEmail} ({m.userEmail}) - {m.role}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Building2, Globe, MapPin, Users, AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
@@ -148,6 +149,14 @@ export default function RecruiterCompanyPage() {
                   <p className="flex items-center gap-2"><Globe size={16} /> <a href={company.websiteUrl} target="_blank" rel="noreferrer" className="hover:text-white transition">{company.websiteUrl}</a></p>
                 )}
               </div>
+
+              <Link
+                href="/dashboard/recruiter/team"
+                className="mt-6 flex items-center justify-center gap-2 w-full rounded-xl bg-indigo-600/20 border border-indigo-500/30 px-4 py-2.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-600/30 transition shadow-inner"
+              >
+                <Users size={14} />
+                Manage Team Workspace & Roles
+              </Link>
             </>
           ) : (
             <div className="text-center py-6">

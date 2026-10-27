@@ -50,15 +50,21 @@ export const auth = betterAuth({
       create: {
         before: async (user) => {
           // Whitelist permitted self-registration roles: seeker or recruiter.
-          // Block privilege escalation to "admin" at registration.
+          // Block privilege escalation to "admin" or "adminRole" at registration.
           const allowedRoles = ["seeker", "recruiter"];
           const requestedRole = (user as any).role;
           const role = allowedRoles.includes(requestedRole) ? requestedRole : "seeker";
 
+          const cleanUser = { ...user };
+          delete (cleanUser as any).adminRole;
+          delete (cleanUser as any).companyId;
+
           return {
             data: {
-              ...user,
+              ...cleanUser,
               role,
+              adminRole: null,
+              companyId: null,
               status: "active",
               plan: "Free",
             },
@@ -67,9 +73,11 @@ export const auth = betterAuth({
       },
       update: {
         before: async (user) => {
-          // Prevent ordinary users from modifying role, status, or plan through user profile updates
+          // Prevent ordinary users from modifying role, adminRole, companyId, status, or plan through user profile updates
           const safeData = { ...user };
           delete (safeData as any).role;
+          delete (safeData as any).adminRole;
+          delete (safeData as any).companyId;
           delete (safeData as any).status;
           delete (safeData as any).plan;
           return { data: safeData };
