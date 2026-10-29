@@ -24,6 +24,7 @@ import {
   Megaphone,
   Users,
   UserCheck,
+  Workflow,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { authClient, useSession } from "@/lib/auth-client";
@@ -56,6 +57,7 @@ const roleLinks = {
     { label: "Candidates", href: "/dashboard/recruiter/candidates", icon: Users },
     { label: "Messages", href: "/dashboard/recruiter/messages", icon: MessageSquare },
     { label: "Analytics", href: "/dashboard/recruiter/analytics", icon: BarChart3 },
+    { label: "Automation", href: "/dashboard/recruiter/automation", icon: Workflow },
     { label: "Billing", href: "/dashboard/recruiter/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/recruiter/settings", icon: Settings },
   ],

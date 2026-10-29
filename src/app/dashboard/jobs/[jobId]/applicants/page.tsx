@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
+import CandidateEvaluationPanel from "@/components/dashboard/CandidateEvaluationPanel";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -441,6 +442,13 @@ export default function JobApplicantsPage({ params }: PageProps) {
                                   Note: {app.recruiterNotes}
                                 </p>
                               )}
+                              {app.reviewStatus === "ready_for_decision" && (
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded font-semibold">
+                                    <Sparkles size={9} /> Ready for Decision
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -741,6 +749,23 @@ export default function JobApplicantsPage({ params }: PageProps) {
                       ))}
                     </select>
                   </div>
+                </div>
+
+                {/* Structured Candidate Evaluation Scorecards */}
+                <div className="border-t border-white/10 pt-4">
+                  <CandidateEvaluationPanel
+                    applicationId={selectedApp._id}
+                    candidateName={selectedApp.seekerName || "Candidate"}
+                    jobId={jobId}
+                    jobTitle={jobTitle}
+                    companyId={selectedApp.companyId || ""}
+                    reviewStatus={selectedApp.reviewStatus}
+                    onRefreshApplication={() => {
+                      apiFetch<any>(`/api/applications/${selectedApp._id}`).then((updated) => {
+                        if (updated) setSelectedApp(updated);
+                      });
+                    }}
+                  />
                 </div>
 
                 {/* Private Recruiter Notes */}

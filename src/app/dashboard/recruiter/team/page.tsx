@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -103,6 +103,11 @@ export default function RecruiterTeamPage() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [myRole, setMyRole] = useState<string>("interviewer");
   const [loadingTeam, setLoadingTeam] = useState(false);
+  const [nowTimestamp, setNowTimestamp] = useState(0);
+
+  useEffect(() => {
+    setNowTimestamp(Date.now());
+  }, []);
 
   // Tab state
   const [activeTab, setActiveTab] = useState<"members" | "invitations" | "vacancies" | "activity">("members");
@@ -747,7 +752,7 @@ export default function RecruiterTeamPage() {
                     };
                     const daysLeft = Math.max(
                       0,
-                      Math.ceil((new Date(inv.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                      Math.ceil((new Date(inv.expiresAt).getTime() - nowTimestamp) / (1000 * 60 * 60 * 24))
                     );
 
                     return (
