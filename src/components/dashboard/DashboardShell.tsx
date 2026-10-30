@@ -55,6 +55,7 @@ const roleLinks = {
     { label: "Team Workspace", href: "/dashboard/recruiter/team", icon: UserCheck },
     { label: "Manage Jobs", href: "/dashboard/recruiter/jobs", icon: Briefcase },
     { label: "Candidates", href: "/dashboard/recruiter/candidates", icon: Users },
+    { label: "Interviews", href: "/dashboard/recruiter/interviews", icon: Calendar },
     { label: "Messages", href: "/dashboard/recruiter/messages", icon: MessageSquare },
     { label: "Analytics", href: "/dashboard/recruiter/analytics", icon: BarChart3 },
     { label: "Automation", href: "/dashboard/recruiter/automation", icon: Workflow },

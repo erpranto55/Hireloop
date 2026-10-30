@@ -29,6 +29,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import CandidateEvaluationPanel from "@/components/dashboard/CandidateEvaluationPanel";
+import PanelScheduleModal from "@/components/modals/PanelScheduleModal";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -802,146 +803,24 @@ export default function JobApplicantsPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Schedule Interview Modal */}
+        {/* Panel Schedule Modal */}
         {showScheduleModal && selectedApp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950 p-6 md:p-8">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600/20 text-indigo-400">
-                    <Calendar size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Schedule Interview</h3>
-                    <p className="text-xs text-zinc-400">Candidate: {selectedApp.seekerName}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowScheduleModal(false)}
-                  className="rounded-lg p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <form onSubmit={handleScheduleInterviewSubmit} className="mt-5 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1">Date *</label>
-                    <input
-                      type="date"
-                      required
-                      value={scheduleDate}
-                      onChange={(e) => setScheduleDate(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1">Time *</label>
-                    <input
-                      type="time"
-                      required
-                      value={scheduleTime}
-                      onChange={(e) => setScheduleTime(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1">Duration</label>
-                    <select
-                      value={scheduleDuration}
-                      onChange={(e) => setScheduleDuration(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
-                    >
-                      <option value="15">15 mins</option>
-                      <option value="30">30 mins</option>
-                      <option value="45">45 mins</option>
-                      <option value="60">60 mins</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1">Timezone</label>
-                    <input
-                      type="text"
-                      value={scheduleTimezone}
-                      onChange={(e) => setScheduleTimezone(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Format</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["video", "phone", "in-person"] as const).map((fmt) => (
-                      <button
-                        type="button"
-                        key={fmt}
-                        onClick={() => {
-                          setScheduleFormat(fmt);
-                          if (fmt === "video") setScheduleLocation("HireLoop Virtual Meeting Room");
-                          else if (fmt === "phone") setScheduleLocation("Recruiter will dial candidate");
-                          else setScheduleLocation("Company HQ");
-                        }}
-                        className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium border transition ${
-                          scheduleFormat === fmt
-                            ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
-                            : "bg-black/60 border-white/10 text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        {fmt === "video" && <Video size={13} />}
-                        {fmt === "phone" && <Phone size={13} />}
-                        {fmt === "in-person" && <MapPin size={13} />}
-                        <span className="capitalize">{fmt}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Location / Link</label>
-                  <input
-                    type="text"
-                    value={scheduleLocation}
-                    onChange={(e) => setScheduleLocation(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Agenda / Instructions</label>
-                  <textarea
-                    rows={2}
-                    value={scheduleAgenda}
-                    onChange={(e) => setScheduleAgenda(e.target.value)}
-                    placeholder="Candidate preparation notes or agenda..."
-                    className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none focus:border-indigo-500 resize-none"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
-                  <button
-                    type="button"
-                    onClick={() => setShowScheduleModal(false)}
-                    className="rounded-xl border border-white/10 px-4 py-2 text-xs font-medium text-zinc-400 hover:bg-white/5 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingSchedule}
-                    className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-50"
-                  >
-                    <Send size={13} />
-                    {submittingSchedule ? "Scheduling..." : "Send Invitation"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <PanelScheduleModal
+            applicationId={selectedApp._id}
+            jobId={jobId}
+            jobTitle={jobTitle || "Job Position"}
+            candidateName={selectedApp.seekerName || selectedApp.seekerEmail}
+            candidateEmail={selectedApp.seekerEmail}
+            onClose={() => setShowScheduleModal(false)}
+            onScheduled={() => {
+              setApplicants((prev) =>
+                prev.map((a) =>
+                  a._id === selectedApp._id ? { ...a, status: "Interview Scheduled" } : a
+                )
+              );
+              setSelectedApp((prev: any) => ({ ...prev, status: "Interview Scheduled" }));
+            }}
+          />
         )}
       </div>
     </div>
