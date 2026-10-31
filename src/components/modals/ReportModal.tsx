@@ -71,7 +71,7 @@ export default function ReportModal({
             <div>
               <h3 className="text-base font-bold text-white">Report Content</h3>
               <p className="text-xs text-zinc-400">
-                Reporting: <span className="text-white font-medium truncate max-w-[200px] inline-block align-bottom">{targetIdentifier}</span>
+                Reporting: <span className="text-white font-medium truncate max-w-50 inline-block align-bottom">{targetIdentifier}</span>
               </p>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function ReportModal({
             </span>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-[11px] text-zinc-400 flex items-start gap-2">
+          <div className="rounded-xl border border-white/10 bg-white/2 p-3 text-[11px] text-zinc-400 flex items-start gap-2">
             <ShieldAlert size={14} className="shrink-0 mt-0.5 text-zinc-400" />
             <span>
               Your report is confidential. The reported account will not be told who submitted the report.
